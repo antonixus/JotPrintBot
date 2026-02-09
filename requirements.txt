@@ -1,0 +1,16 @@
+# Telegram bot (async, Python 3.10+)
+aiogram>=3.0,<4
+
+# Adafruit thermal printer (Raspberry Pi compatible via Blinka)
+adafruit-circuitpython-thermal-printer>=1.4.0
+Adafruit-Blinka>=8.0.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# Testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Standard library (no install needed - for reference only):
+# textwrap, logging, asyncio
