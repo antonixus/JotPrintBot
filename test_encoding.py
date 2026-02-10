@@ -1,19 +1,4 @@
 #!/usr/bin/env python3
-"""Simple script to test printer output with different encodings.
-
-Usage (from project root, venv activated):
-
-  python test_encoding.py
-      → uses a default sample text and encodings
-
-  python test_encoding.py "Привет, мир!" cp1251 cp866
-      → prints the given text once per encoding
-
-For each encoding, the script:
-  - prints the encoding name
-  - prints the text encoded with that codec
-"""
-
 from __future__ import annotations
 
 import sys
@@ -33,40 +18,19 @@ def get_printer() -> printer.Serial:
         stopbits=config.SERIAL_STOPBITS,
         timeout=config.SERIAL_TIMEOUT,
         dsrdtr=config.SERIAL_DSRDTR,
+        codepage=config.CODEPAGE,
     )
 
 
-def main(argv: list[str] | None = None) -> None:
-    argv = argv if argv is not None else sys.argv[1:]
-
-    # First argument: text; rest: encodings
-    if argv:
-        text = argv[0]
-        encodings = argv[1:] or [config.CODEPAGE, "cp866", "latin-1"]
-    else:
-        text = "Привет, мир! Hello, world!"
-        encodings = [config.CODEPAGE, "cp866", "latin-1"]
+def main():
 
     p = get_printer()
-
     p.set(align="left", font=config.FONT or "a")
     p.textln("=== Encoding test ===")
-    p.textln(f"Text: {text}")
+    text = "Привет, мир! Hello, world!"
+    data = text.decode('UTF-8').encode('cp1251', errors="replace")
+    p.textln(f"Text: {data}")
     p.textln("")
-
-    for enc in encodings:
-        p.textln(f"--- encoding: {enc} ---")
-        try:
-            data = text.encode(enc, errors="replace")
-        except LookupError:
-            p.textln(f"(codec {enc!r} not found)\n")
-            continue
-
-        # Use latin-1 trick so bytes go 1:1 over the wire
-        pseudo_str = data.decode("latin-1")
-        p.textln(pseudo_str)
-        p.textln("")
-
     try:
         p.cut()
     except TypeError:
