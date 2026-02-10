@@ -73,6 +73,7 @@ class AsyncPrinter:
                 invert=config.TEXT_INVERT,
                 smooth=config.TEXT_SMOOTH,
                 flip=config.TEXT_FLIP,
+                codepage=config.CODEPAGE,
             )
         except Exception:
             # Not all backends/printers support all settings
@@ -103,7 +104,7 @@ class AsyncPrinter:
         """Blocking print (runs in executor)."""
         # Encode text using configured code page (default cp1251) so that
         # Cyrillic and other characters print correctly on the device.
-        data = (wrapped + "\n").encode(config.CODEPAGE, errors="replace")
+        data = (wrapped + "\n").encode("ascii", errors="replace")
         try:
             # Send raw bytes directly when possible
             self.printer._raw(data)
