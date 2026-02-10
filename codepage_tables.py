@@ -67,7 +67,7 @@ def print_codepage(p: printer.Serial, codepage: str) -> None:
     # Table body
     for x in range(0, 16):
         # First column
-        p.set(font="b")
+        p.set(font="a")
         p._raw((f"{hex(x)[2:]} ").encode("ascii", errors="replace"))
         p.set()
 
@@ -96,12 +96,12 @@ def main(argv: list[str] | None = None) -> None:
     p = get_printer()
 
     # Small header
-    p.set(height=2, width=2, align="center")
+    p.set(height=1, width=1, align="center")
     p._raw(b"Code page tables\n\n")
     p.set()
 
     for cp in codes:
-        p.set(height=2, width=2)
+        p.set(height=1, width=1)
         p._raw((str(cp) + "\n\n").encode("ascii", errors="replace"))
         print_codepage(p, cp)
         p._raw("\n\n")
