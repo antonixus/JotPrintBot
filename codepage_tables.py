@@ -61,14 +61,14 @@ def print_codepage(p: printer.Serial, codepage: str) -> None:
     # Table header (top row)
     p.set(font="b")
     header = "  " + sep.join(hex(s)[2:] for s in range(0, 16))
-    p._raw(header + "\n")
+    p._raw((header + "\n").encode("ascii", errors="replace"))
     p.set()  # reset to defaults
 
     # Table body
     for x in range(0, 16):
         # First column
         p.set(font="b")
-        p._raw(f"{hex(x)[2:]} ")
+        p._raw((f"{hex(x)[2:]} ").encode("ascii", errors="replace"))
         p.set()
 
         for y in range(0, 16):
@@ -80,9 +80,12 @@ def print_codepage(p: printer.Serial, codepage: str) -> None:
             else:
                 ch = byte
 
-            p._raw(ch)
-            p._raw(sep)
-        p._raw("\n")
+            if isinstance(ch, bytes):
+                p._raw(ch)
+            else:
+                p._raw(str(ch).encode("ascii", errors="replace"))
+            p._raw(sep.encode("ascii", errors="replace"))
+        p._raw(b"\n")
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -94,12 +97,12 @@ def main(argv: list[str] | None = None) -> None:
 
     # Small header
     p.set(height=2, width=2, align="center")
-    p._raw("Code page tables\n\n")
+    p._raw(b"Code page tables\n\n")
     p.set()
 
     for cp in codes:
         p.set(height=2, width=2)
-        p._raw(f"{cp}\n\n")
+        p._raw((str(cp) + "\n\n").encode("ascii", errors="replace"))
         print_codepage(p, cp)
         p._raw("\n\n")
 
