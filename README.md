@@ -89,7 +89,6 @@ Edit `.env` in the project root:
 | `SERIAL_PORT`  | No       | Serial device (default: `/dev/serial0`)          |
 | `BAUDRATE`     | No       | Baud rate (default: `9600`)                      |
 | `MOCK_PRINTER` | No       | `true` to run without hardware (default: `false`) |
-| `CODEPAGE`     | No       | Character encoding (default: `cp1251`)           |
 | `FONT`         | No       | Printer font (default: `12x24`)                  |
 | `DENSITY_LEVEL`| No       | Print density 0–8 (default: `4`)                 |
 

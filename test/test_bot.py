@@ -15,7 +15,6 @@ def patch_config():
         pc.MOCK_PRINTER = True
         pc.SERIAL_PORT = "/dev/serial0"
         pc.BAUDRATE = 9600
-        pc.CODEPAGE = "cp1251"
         pc.FONT = "12x24"
         pc.DENSITY_LEVEL = 4
         yield

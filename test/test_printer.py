@@ -13,7 +13,6 @@ def mock_config():
         mock_cfg.MOCK_PRINTER = True
         mock_cfg.SERIAL_PORT = "/dev/serial0"
         mock_cfg.BAUDRATE = 9600
-        mock_cfg.CODEPAGE = "cp1251"
         mock_cfg.FONT = "12x24"
         mock_cfg.DENSITY_LEVEL = 4
         yield mock_cfg

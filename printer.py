@@ -45,8 +45,6 @@ class AsyncPrinter:
         self.queue: asyncio.Queue[str] = asyncio.Queue()
         self._mock = config.MOCK_PRINTER
 
-        # Configure printer
-        self.printer.charcode(config.CODEPAGE)
         if config.FONT == "12x24":
             # ESC M 0 = Font A (12x24)
             self.printer._raw(b"\x1b\x4d\x00")
@@ -75,7 +73,8 @@ class AsyncPrinter:
 
     def _do_print(self, wrapped: str) -> None:
         """Blocking print (runs in executor)."""
-        self.printer.text(wrapped.encode(config.CODEPAGE))
+        # Let python-escpos handle encoding / codepage with its defaults
+        self.printer.text(wrapped)
         self.printer.cut(partial=True)
 
     async def status(self) -> dict[str, bool]:
