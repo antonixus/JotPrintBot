@@ -74,3 +74,6 @@ Thumbs.db
 *.temp
 *.bak
 *.cache
+
+# Other
+releases/
