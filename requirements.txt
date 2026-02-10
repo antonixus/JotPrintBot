@@ -1,9 +1,8 @@
-# Telegram bot (async, Python 3.10+)
+# Telegram bot (async, Python 3.8+)
 aiogram>=3.0,<4
 
-# Adafruit thermal printer (Raspberry Pi compatible via Blinka)
-adafruit-circuitpython-thermal-printer>=1.4.0
-Adafruit-Blinka>=8.0.0
+# ESC/POS thermal printer (CSN-A2 and compatible models)
+python-escpos>=3.0
 
 # Configuration
 python-dotenv>=1.0.0
