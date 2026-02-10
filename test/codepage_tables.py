@@ -3,13 +3,13 @@
 
 Usage examples (from project root, with venv activated):
 
-  python codepage_tables.py
+  python -m test.codepage_tables
       → prints the default "USA" table.
 
-  python codepage_tables.py cp1251
+  python -m test.codepage_tables cp1251
       → prints the table for the named code page (if supported by python-escpos).
 
-  python codepage_tables.py 17
+  python -m test.codepage_tables 17
       → prints the table for numeric codepage ID 17.
 
 The serial connection parameters and device are taken from config.py / .env.

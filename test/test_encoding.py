@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Test Cyrillic output using python-escpos and textln."""
+"""Test Cyrillic output using python-escpos and textln.
+
+Usage (from project root, with venv activated):
+
+  python -m test.test_encoding
+"""
 
 from __future__ import annotations
 
@@ -19,25 +24,21 @@ def get_printer() -> printer.Serial:
         stopbits=config.SERIAL_STOPBITS,
         timeout=config.SERIAL_TIMEOUT,
         dsrdtr=config.SERIAL_DSRDTR,
-        profile="RP326",
+        profile=config.PRINTER_PROFILE,
     )
 
 
 def main() -> None:
     p = get_printer()
 
-    # Initialize and select ESC/POS codepage 6 (cp1251 on your printer)
+    # Initialize and select ESC/POS codepage ID from config (6 == cp1251 on your printer)
     p._raw(b"\x1b\x40")  # ESC @
-    p._raw(CODEPAGE_CHANGE + bytes((6,)))
+    p._raw(CODEPAGE_CHANGE + bytes((config.CODEPAGE_ID,)))
 
     text = "Привет, мир!"
 
-    # Encode text to cp1251, then map bytes 1:1 via latin-1 so that
-    # python-escpos.textln sends exactly those bytes while still
-    # accepting a Python str.
-
     p.set(align="left", font=config.FONT or "a")
-    p.textln("=== escpos textln cp1251 test ===")
+    p.textln("=== escpos textln test ===")
     p.textln(text)
     p.textln("")
 
@@ -52,3 +53,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

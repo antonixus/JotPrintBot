@@ -67,8 +67,15 @@ class ThrottlingMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: dict[str, Any],
     ) -> Any:
+        # Pass through if there is no user (e.g. service updates)
         if event.from_user is None:
             return await handler(event, data)
+
+        # Do not apply rate limiting to command messages like /start, /help, /status.
+        # The limit should only apply to actual text that is sent to the printer.
+        if isinstance(event, Message) and event.text and event.text.startswith("/"):
+            return await handler(event, data)
+
         uid = event.from_user.id
         bucket = (self.key, uid)
         now = time()
