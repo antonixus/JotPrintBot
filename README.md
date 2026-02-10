@@ -20,7 +20,7 @@ The bot uses [aiogram](https://docs.aiogram.dev/) for Telegram integration and [
 
 - **Print text** — Send any text message (up to 1000 characters); it will be wrapped to 32 characters per line and queued for printing
 - **Whitelist access** — Only users in the whitelist can use the bot; others receive "Access denied"
-- **Rate limiting** — 1 print per 60 seconds per user to prevent abuse
+- **Rate limiting** — 1 print per 20 seconds per user by default (configurable)
 - **Commands:**
   - `/start` — Welcome message and usage instructions
   - `/status` — Check if the printer is online
@@ -89,10 +89,18 @@ Edit `.env` in the project root:
 | `SERIAL_PORT`  | No       | Serial device (default: `/dev/serial0`)          |
 | `BAUDRATE`     | No       | Baud rate (default: `9600`)                      |
 | `MOCK_PRINTER` | No       | `true` to run without hardware (default: `false`) |
-| `FONT`         | No       | Printer font (default: `12x24`)                  |
+| `FONT`         | No       | Printer font code for python-escpos (default: `a`) |
 | `DENSITY_LEVEL`| No       | Print density 0–8 (default: `4`)                 |
+| `PRINT_RATE_LIMIT_SECONDS` | No | Seconds between prints per user (default: `20`) |
+| `SERIAL_BYTESIZE` | No | Serial byte size (default: `8`) |
+| `SERIAL_PARITY` | No | Serial parity (default: `N`) |
+| `SERIAL_STOPBITS` | No | Serial stop bits (default: `1`) |
+| `SERIAL_TIMEOUT` | No | Serial timeout in seconds (default: `1.0`) |
+| `SERIAL_DSRDTR` | No | Enable DSR/DTR flow control (default: `true`) |
 
 **Raspberry Pi / DietPi:** Enable serial in `raspi-config` → Interface Options → Serial Port.
+
+The printer connection uses UART serial. Many ESC/POS printers work with 9600 baud, 8N1, and (depending on model) may require DSR/DTR flow control. This project defaults to those values (see the “Printing Text” example in the CircuitDigest guide) and you can override them via `.env` if needed. See: [Thermal Printer Interfacing with Raspberry Pi](https://circuitdigest.com/microcontroller-projects/thermal-printer-interfacing-with-raspberry-pi-zero-to-print-text-images-and-bar-codes).
 
 ---
 
@@ -137,7 +145,7 @@ View status: `sudo systemctl status bot`. View logs: `journalctl -u bot -f`.
 
 ### Limits
 
-- **Rate:** 1 print per 60 seconds per user
+- **Rate:** 1 print per 20 seconds per user (default, configurable via `PRINT_RATE_LIMIT_SECONDS`)
 - **Text length:** Maximum 1000 characters per message
 
 ---

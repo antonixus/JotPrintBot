@@ -3,9 +3,9 @@
 import asyncio
 import logging
 import textwrap
+from typing import Any
 
 import config
-from escpos.printer import Serial
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +18,9 @@ class MockPrinter:
 
     def cut(self, partial: bool = True) -> None:
         """No-op stub."""
+
+    def set(self, **kwargs: Any) -> None:
+        """No-op stub for python-escpos set()."""
 
     def status(self) -> bool:
         """Return online status."""
@@ -34,21 +37,36 @@ class AsyncPrinter:
     """Async wrapper for CSN-A2 TTL thermal printer using python-escpos."""
 
     def __init__(self) -> None:
+        self.printer: Any
         if config.MOCK_PRINTER:
             self.printer = MockPrinter()
         else:
+            # Import lazily so dev/tests can run without escpos installed
+            from escpos.printer import Serial  # type: ignore
+
+            # Serial settings based on common ESC/POS UART defaults:
+            # 9600 baud, 8N1, with DSR/DTR flow control enabled.
+            # See: https://circuitdigest.com/microcontroller-projects/thermal-printer-interfacing-with-raspberry-pi-zero-to-print-text-images-and-bar-codes
             self.printer = Serial(
                 devfile=config.SERIAL_PORT,
                 baudrate=config.BAUDRATE,
-                profile="TM-T88II",
+                bytesize=config.SERIAL_BYTESIZE,
+                parity=config.SERIAL_PARITY,
+                stopbits=config.SERIAL_STOPBITS,
+                timeout=config.SERIAL_TIMEOUT,
+                dsrdtr=config.SERIAL_DSRDTR,
             )
         self.queue: asyncio.Queue[str] = asyncio.Queue()
         self._mock = config.MOCK_PRINTER
 
-        if config.FONT == "12x24":
-            # ESC M 0 = Font A (12x24)
-            self.printer._raw(b"\x1b\x4d\x00")
-        self.printer._raw(bytes([0x1D, 0x21, config.DENSITY_LEVEL]))
+        # Basic text style defaults (best-effort; depends on printer profile)
+        # FONT is passed directly to python-escpos (usually "a" or "b")
+        font = config.FONT or "a"
+        try:
+            self.printer.set(font=font, density=config.DENSITY_LEVEL)
+        except Exception:
+            # Not all backends/printers support all settings
+            pass
 
     async def print_text(self, text: str) -> None:
         """Print text with wrapping. Non-blocking."""
@@ -75,7 +93,25 @@ class AsyncPrinter:
         """Blocking print (runs in executor)."""
         # Let python-escpos handle encoding / codepage with its defaults
         self.printer.text(wrapped)
-        self.printer.cut(partial=True)
+        self._cut()
+
+    def _cut(self) -> None:
+        """Cut paper with python-escpos version compatibility."""
+        # python-escpos API differs across versions:
+        # - some accept cut(partial=True)
+        # - some accept cut(mode="PART")
+        # - some accept cut() only
+        try:
+            self.printer.cut(partial=True)
+            return
+        except TypeError:
+            pass
+        try:
+            self.printer.cut(mode="PART")
+            return
+        except TypeError:
+            pass
+        self.printer.cut()
 
     async def status(self) -> dict[str, bool]:
         """Return printer online status."""

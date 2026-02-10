@@ -49,7 +49,7 @@ class AuthMiddleware(BaseMiddleware):
         return await handler(event, data)
 
 
-# --- Throttling middleware (1 msg / 60 sec per user, scoped by key) ---
+# --- Throttling middleware (1 msg / N sec per user, scoped by key) ---
 class ThrottlingMiddleware(BaseMiddleware):
     """Rate limit: rate_limit msgs per period seconds per user, scoped by key."""
 
@@ -82,7 +82,11 @@ class ThrottlingMiddleware(BaseMiddleware):
         timestamps = self.user_timestamps[bucket]
         timestamps[:] = [t for t in timestamps if now - t < self.period]
         if len(timestamps) >= self.rate_limit:
-            await event.answer("Too many requests. Please wait.")
+            seconds = int(self.period)
+            await event.answer(
+                f"Print rate limit exceeded. Limit 1 print per {seconds} sec.\n"
+                f"Please wait {seconds} sec and try again."
+            )
             return
         timestamps.append(now)
         return await handler(event, data)
@@ -105,13 +109,14 @@ async def status_handler(message: Message) -> None:
 @dp.message(Command("help"))
 async def help_handler(message: Message) -> None:
     """Handle /help command - list commands and limits."""
+    seconds = config.PRINT_RATE_LIMIT_SECONDS
     help_text = (
         "Commands:\n"
         "/start - Welcome and usage\n"
         "/status - Check printer online status\n"
         "/help - List commands and limits\n\n"
         "Limits:\n"
-        "• Rate: 1 print per 60 seconds\n"
+        f"• Rate: 1 print per {seconds} seconds\n"
         "• Text length: max 1000 characters"
     )
     await message.reply(help_text)
@@ -148,7 +153,9 @@ def setup() -> None:
     """Register middleware and router."""
     dp.message.middleware(AuthMiddleware())
     dp.message.middleware(
-        ThrottlingMiddleware(key="print", rate_limit=1, period=60.0)
+        ThrottlingMiddleware(
+            key="print", rate_limit=1, period=float(config.PRINT_RATE_LIMIT_SECONDS)
+        )
     )
 
 

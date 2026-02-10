@@ -114,7 +114,10 @@ class TestThrottlingMiddleware:
         result = await mw(mock_handler, mock_event, {})
         assert result is None
         mock_handler.assert_not_called()
-        mock_event.answer.assert_called_once_with("Too many requests. Please wait.")
+        mock_event.answer.assert_called_once_with(
+            "Print rate limit exceeded. Limit 1 print per 60 sec.\n"
+            "Please wait 60 sec and try again."
+        )
 
     @pytest.mark.asyncio
     async def test_allows_after_period_expires(self, mock_event, mock_handler):
