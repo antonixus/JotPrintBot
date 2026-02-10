@@ -51,7 +51,7 @@ class TestAsyncPrinterPrintText:
         caplog.set_level(logging.INFO)
         p = AsyncPrinter()
         await p.print_text("Hello, world!")
-        assert "Mock print: Hello, world!" in caplog.text
+        assert "Printed (mock): Hello, world!" in caplog.text
 
     async def test_print_text_completes_without_error(self, mock_config):
         """print_text should not raise in mock mode."""
@@ -65,7 +65,7 @@ class TestAsyncPrinterPrintText:
         caplog.set_level(logging.INFO)
         p = AsyncPrinter()
         await p.print_text("")
-        assert "Mock print:" in caplog.text
+        assert "Printed (mock):" in caplog.text
 
 
 @pytest.mark.asyncio
