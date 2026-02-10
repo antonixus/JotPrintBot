@@ -37,6 +37,15 @@ The bot uses [aiogram](https://docs.aiogram.dev/) for Telegram integration and [
 - Python 3.8+ (3.12 recommended)
 - Serial thermal printer (or mock mode for testing)
 
+On Raspberry Pi / Debian you also need some system libraries for Pillow and Tk:
+
+```bash
+sudo apt update
+sudo apt install -y \
+  libtiff6 libjpeg-dev zlib1g-dev libfreetype6-dev \
+  liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk
+```
+
 ### 1. Clone the repository
 
 ```bash

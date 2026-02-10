@@ -3,6 +3,7 @@ aiogram>=3.0,<4
 
 # ESC/POS thermal printer (CSN-A2 and compatible models)
 python-escpos>=3.0
+pyserial>=3.5
 
 # Configuration
 python-dotenv>=1.0.0
