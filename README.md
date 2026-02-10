@@ -56,10 +56,16 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. Run setup (creates config and folders)
+### 3. Run setup (creates config, folders, and systemd service)
 
 ```bash
 python setup.py
+```
+
+Setup creates the `logs/` folder, `.env` (if missing), and generates `bot.service` for systemd. On Raspberry Pi, install the service with:
+
+```bash
+python setup.py --install-service
 ```
 
 ### 4. Configure `.env`
@@ -91,6 +97,27 @@ python bot.py
 ```
 
 The bot will start polling for updates. Send a message to your bot on Telegram to print it.
+
+#### Run in background (screen)
+
+```bash
+screen -S bot python bot.py
+```
+
+Detach with `Ctrl+A`, then `D`. Reattach with `screen -r bot`.
+
+#### Run as systemd service (Raspberry Pi)
+
+Setup generates `bot.service` with the correct paths. Install for auto-start on boot:
+
+```bash
+python setup.py --install-service
+sudo systemctl start bot
+```
+
+Or manually: copy `bot.service` to `/etc/systemd/system/`, edit paths if needed, then `sudo systemctl daemon-reload && sudo systemctl enable bot && sudo systemctl start bot`.
+
+View status: `sudo systemctl status bot`. View logs: `journalctl -u bot -f`.
 
 ### Commands
 

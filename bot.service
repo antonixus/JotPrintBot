@@ -1,0 +1,14 @@
+[Unit]
+Description=Telegram Printer Bot
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/telegram-printer-bot
+ExecStart=/home/pi/telegram-printer-bot/venv/bin/python bot.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
