@@ -16,6 +16,9 @@ class MockPrinter:
     def text(self, data: str | bytes) -> None:
         """No-op stub."""
 
+    def textln(self, data: str | bytes) -> None:
+        """No-op stub for line-oriented text."""
+
     def cut(self, partial: bool = True) -> None:
         """No-op stub."""
 
@@ -39,6 +42,9 @@ class MockPrinter:
 
     def _raw(self, data: bytes) -> None:
         """No-op stub."""
+
+    def qr(self, data: str, native: bool = True, size: int = 8) -> None:
+        """No-op stub for QR codes."""
 
 
 class AsyncPrinter:
@@ -114,10 +120,42 @@ class AsyncPrinter:
                     raise
                 await asyncio.sleep(0.5)
 
+    async def print_qr(self, data: str, size: int = 8) -> None:
+        """Print QR code for the given data. Non-blocking."""
+        if self._mock:
+            logger.info("QR printed (mock): %s", data[:50])
+            return
+        for attempt in range(3):
+            try:
+                await asyncio.get_running_loop().run_in_executor(
+                    None,
+                    self._do_print_qr,
+                    data,
+                    size,
+                )
+                logger.info("QR printed: %s", data[:50])
+                return
+            except Exception as e:
+                logger.error("QR print attempt %d failed: %s", attempt + 1, e)
+                if attempt == 2:
+                    raise
+                await asyncio.sleep(0.5)
+
     def _do_print(self, wrapped: str) -> None:
         """Blocking print (runs in executor)."""
 
         self.printer.textln(wrapped)
+        self._cut()
+
+    def _do_print_qr(self, data: str, size: int) -> None:
+        """Blocking QR print (runs in executor)."""
+        # python-escpos qr() supports `native` and `size` in recent versions.
+        # See: https://python-escpos.readthedocs.io/en/latest/user/cli-user.html#qr
+        try:
+            self.printer.qr(data, native=True, size=size)
+        except TypeError:
+            # Fallback for older versions without `native` kwarg
+            self.printer.qr(data, size=size)
         self._cut()
 
     def _cut(self) -> None:

@@ -122,10 +122,12 @@ async def help_handler(message: Message) -> None:
         "Commands:\n"
         "/start - Welcome and usage\n"
         "/status - Check printer online status\n"
+        "/qr <text> - Print text as a QR code\n"
         "/help - List commands and limits\n\n"
         "Limits:\n"
         f"• Rate: 1 print per {seconds} seconds\n"
-        "• Text length: max 1000 characters"
+        "• Text length: max 1000 characters\n"
+        "• QR text length: max 500 characters"
     )
     await message.reply(help_text)
 
@@ -138,6 +140,26 @@ async def error_handler(event: TelegramObject, exception: Exception) -> None:
         await bot.send_message(config.ADMIN_ID, f"Error: {exception}")
     except Exception:
         pass
+
+
+@dp.message(Command("qr"))
+async def qr_handler(message: Message) -> None:
+    """Handle /qr command - print a QR code with given text."""
+    text = (message.text or "").partition(" ")[2].strip()
+    if not text:
+        await message.reply("Usage: /qr your text to encode")
+        return
+    if len(text) > 500:
+        await message.reply("QR content too long (max 500 characters).")
+        return
+    logger.info("QR request from user %s: %s", message.from_user.id, text[:50])
+    try:
+        await printer.print_qr(text)
+    except Exception as e:
+        logger.error("QR print failed: %s", e, exc_info=True)
+        await message.reply("Failed to print QR code.")
+        return
+    await message.reply("QR code sent to printer!")
 
 
 @dp.message()
