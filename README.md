@@ -1,0 +1,149 @@
+# Telegram Printer Bot
+
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/antonixus/telegram-printer-bot/blob/main/LICENSE)
+
+## Introduction
+
+**Telegram Printer Bot** is an asynchronous Python application that allows you to print text from Telegram messages to a thermal receipt printer. Send a message to the bot, and it will be printed on paper via a connected ESC/POS thermal printer.
+
+**Supported hardware:**
+- **CSN-A2 TTL** thermal printer (and other ESC/POS compatible models)
+- **Raspberry Pi** / **DietPi** (serial connection via `/dev/serial0` or similar)
+- Any Linux system with a serial or USB-Serial thermal printer
+
+The bot uses [aiogram](https://docs.aiogram.dev/) for Telegram integration and [python-escpos](https://python-escpos.readthedocs.io/) for printer control.
+
+---
+
+## Functionality
+
+- **Print text** — Send any text message (up to 1000 characters); it will be wrapped to 32 characters per line and queued for printing
+- **Whitelist access** — Only users in the whitelist can use the bot; others receive "Access denied"
+- **Rate limiting** — 1 print per 60 seconds per user to prevent abuse
+- **Commands:**
+  - `/start` — Welcome message and usage instructions
+  - `/status` — Check if the printer is online
+  - `/help` — List commands and limits
+- **Mock mode** — Run without a physical printer for development (`MOCK_PRINTER=true`)
+- **Error handling** — Exceptions are logged and the admin is notified via Telegram
+
+---
+
+## Installation and Configuration
+
+### Requirements
+
+- Python 3.8+ (3.12 recommended)
+- Serial thermal printer (or mock mode for testing)
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/antonixus/telegram-printer-bot.git
+cd telegram-printer-bot
+```
+
+### 2. Create virtual environment and install dependencies
+
+```bash
+python -m venv venv
+# Linux/macOS:
+source venv/bin/activate
+# Windows:
+venv\Scripts\activate
+
+pip install -r requirements.txt
+```
+
+### 3. Run setup (creates config and folders)
+
+```bash
+python setup.py
+```
+
+### 4. Configure `.env`
+
+Edit `.env` in the project root:
+
+| Variable       | Required | Description                                      |
+|----------------|----------|--------------------------------------------------|
+| `BOT_TOKEN`    | Yes      | Telegram bot token from [@BotFather](https://t.me/BotFather) |
+| `ADMIN_ID`     | Yes      | Your Telegram user ID (for error notifications)  |
+| `WHITELIST`    | Yes      | Comma-separated Telegram user IDs allowed to use the bot |
+| `SERIAL_PORT`  | No       | Serial device (default: `/dev/serial0`)          |
+| `BAUDRATE`     | No       | Baud rate (default: `9600`)                      |
+| `MOCK_PRINTER` | No       | `true` to run without hardware (default: `false`) |
+| `CODEPAGE`     | No       | Character encoding (default: `cp1251`)           |
+| `FONT`         | No       | Printer font (default: `12x24`)                  |
+| `DENSITY_LEVEL`| No       | Print density 0–8 (default: `4`)                 |
+
+**Raspberry Pi / DietPi:** Enable serial in `raspi-config` → Interface Options → Serial Port.
+
+---
+
+## Usage
+
+### Launch the application
+
+```bash
+python bot.py
+```
+
+The bot will start polling for updates. Send a message to your bot on Telegram to print it.
+
+### Commands
+
+| Command   | Description                           |
+|-----------|---------------------------------------|
+| `/start`  | Welcome message and basic instructions |
+| `/status` | Check if the printer is online        |
+| `/help`   | List all commands and limits          |
+
+### Limits
+
+- **Rate:** 1 print per 60 seconds per user
+- **Text length:** Maximum 1000 characters per message
+
+---
+
+## Tests
+
+The project uses [pytest](https://docs.pytest.org/) with [pytest-asyncio](https://pytest-asyncio.readthedocs.io/) for async tests.
+
+### Run all tests
+
+```bash
+pytest test/ -v
+```
+
+### Run specific test files
+
+```bash
+pytest test/test_bot.py -v    # Bot handlers, middleware, rate limiting
+pytest test/test_printer.py -v # Printer module with mock
+```
+
+### Test coverage
+
+Tests cover:
+- **Bot:** Auth and throttling middleware, `/start`, `/status`, `/help`, print queue handler
+- **Printer:** Initialization, `print_text`, `status` in mock mode
+
+---
+
+## Logging
+
+Logging is configured with a **rotating file handler**:
+
+- **File:** `logs/app.log`
+- **Max size:** 10 MB per file
+- **Backup count:** 5 (keeps up to 5 rotated files)
+- **Level:** INFO
+
+**Logged events include:**
+- `Message received` — When text is queued for printing
+- `Printed` / `Printed (mock)` — When a print job completes
+- Errors with full tracebacks (print failures, handler exceptions, status check failures)
+
+Logs are written to `logs/` (created automatically on startup). Ensure the application has write permissions to the project directory.
