@@ -55,11 +55,18 @@ class AsyncPrinter:
                 stopbits=config.SERIAL_STOPBITS,
                 timeout=config.SERIAL_TIMEOUT,
                 dsrdtr=config.SERIAL_DSRDTR,
+                profile=config.PRINTER_PROFILE,
             )
         self.queue: asyncio.Queue[str] = asyncio.Queue()
         self._mock = config.MOCK_PRINTER
 
         try:
+            # Initialize and select ESC/POS code page once at startup.
+            # ESC @ (initialize)
+            self.printer._raw(b"\x1b\x40")
+            # ESC t <n>  (select codepage ID; on your printer 6 == cp1251)
+            self.printer._raw(b"\x1bt" + bytes((config.CODEPAGE_ID,)))
+
             # Basic text style defaults (best-effort; depends on printer profile)
             # FONT is passed directly to python-escpos (usually "a" or "b")
             font = config.FONT or "a"
@@ -73,7 +80,6 @@ class AsyncPrinter:
                 invert=config.TEXT_INVERT,
                 smooth=config.TEXT_SMOOTH,
                 flip=config.TEXT_FLIP,
-                codepage=config.CODEPAGE,
             )
         except Exception:
             # Not all backends/printers support all settings
@@ -103,8 +109,7 @@ class AsyncPrinter:
     def _do_print(self, wrapped: str) -> None:
         """Blocking print (runs in executor)."""
 
-        data = (wrapped + "\n")
-        self.printer.textln(data)
+        self.printer.textln(wrapped)
         self._cut()
 
     def _cut(self) -> None:
