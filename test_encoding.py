@@ -19,6 +19,7 @@ def get_printer() -> printer.Serial:
         stopbits=config.SERIAL_STOPBITS,
         timeout=config.SERIAL_TIMEOUT,
         dsrdtr=config.SERIAL_DSRDTR,
+        profile="RP326",
     )
 
 
@@ -34,12 +35,10 @@ def main() -> None:
     # Encode text to cp1251, then map bytes 1:1 via latin-1 so that
     # python-escpos.textln sends exactly those bytes while still
     # accepting a Python str.
-    data = text.encode("cp1251", errors="replace")
-    pseudo_str = data.decode("latin-1")
 
     p.set(align="left", font=config.FONT or "a")
     p.textln("=== escpos textln cp1251 test ===")
-    p.textln(pseudo_str)
+    p.textln(text)
     p.textln("")
 
     try:
