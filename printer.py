@@ -56,7 +56,7 @@ class AsyncPrinter:
         """Print text with wrapping. Non-blocking."""
         wrapped = textwrap.fill(text, width=32)
         if self._mock:
-            logger.info("Mock print: %s", text)
+            logger.info("Printed (mock): %s", text[:50])
             return
         for attempt in range(3):
             try:
@@ -65,6 +65,7 @@ class AsyncPrinter:
                     self._do_print,
                     wrapped,
                 )
+                logger.info("Printed: %s", text[:50])
                 return
             except Exception as e:
                 logger.error("Print attempt %d failed: %s", attempt + 1, e)
@@ -87,7 +88,7 @@ class AsyncPrinter:
             )
             return {"online": bool(st)}
         except Exception as e:
-            logger.error("Status check failed: %s", e)
+            logger.error("Status check failed: %s", e, exc_info=True)
             return {"online": False}
 
     async def _process_queue(self) -> None:
@@ -97,6 +98,8 @@ class AsyncPrinter:
             try:
                 await self.print_text(text)
             except Exception as e:
-                logger.error("Queue processing failed for text %r: %s", text[:50], e)
+                logger.error(
+                    "Queue processing failed for text %r: %s", text[:50], e, exc_info=True
+                )
             finally:
                 self.queue.task_done()
