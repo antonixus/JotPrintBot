@@ -28,7 +28,8 @@ def main():
     p.set(align="left", font=config.FONT or "a")
     p.textln("=== Encoding test ===")
     text = "Привет, мир! Hello, world!"
-    data = text.decode('UTF-8').encode('cp1251', errors="replace")
+    data = text.encode('cp1251', errors="replace")
+    
     p.textln(f"Text: {data}")
     p.textln("")
     try:
