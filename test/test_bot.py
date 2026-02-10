@@ -168,6 +168,7 @@ class TestStatusHandler:
         mock_message.reply.assert_called_once()
         call_args = mock_message.reply.call_args[0][0]
         assert "Printer online:" in call_args
+        assert "Paper status:" in call_args
 
 
 class TestHelpHandler:

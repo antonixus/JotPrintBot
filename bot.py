@@ -103,7 +103,15 @@ async def start(message: Message) -> None:
 async def status_handler(message: Message) -> None:
     """Handle /status command."""
     stat = await printer.status()
-    await message.reply(f"Printer online: {stat['online']}")
+    online = bool(stat.get("online"))
+    paper = stat.get("paper")
+    paper_text = "unknown"
+    if paper in (0, 1, 2):
+        paper_text = f"{paper} (2=adequate, 1=near-end, 0=no paper)"
+    await message.reply(
+        f"Printer online: {online}\n"
+        f"Paper status: {paper_text}"
+    )
 
 
 @dp.message(Command("help"))

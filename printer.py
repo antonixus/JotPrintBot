@@ -26,6 +26,14 @@ class MockPrinter:
         """Return online status."""
         return True
 
+    def is_online(self) -> bool:
+        """Return online status (python-escpos compatible)."""
+        return True
+
+    def paper_status(self) -> int:
+        """Return paper status (python-escpos compatible)."""
+        return 2
+
     def charcode(self, code: str) -> None:
         """No-op stub."""
 
@@ -130,18 +138,27 @@ class AsyncPrinter:
             pass
         self.printer.cut()
 
-    async def status(self) -> dict[str, bool]:
-        """Return printer online status."""
-        if self._mock:
-            return {"online": True}
+    def _query_status_sync(self) -> dict[str, object]:
+        """Query printer status synchronously (runs in executor)."""
+        online = bool(self.printer.is_online())
+        paper: int | None
         try:
-            st = await asyncio.get_running_loop().run_in_executor(
-                None, self.printer.status
+            paper = int(self.printer.paper_status())
+        except Exception:
+            paper = None
+        return {"online": online, "paper": paper}
+
+    async def status(self) -> dict[str, object]:
+        """Return printer online + paper status."""
+        if self._mock:
+            return {"online": True, "paper": 2}
+        try:
+            return await asyncio.get_running_loop().run_in_executor(
+                None, self._query_status_sync
             )
-            return {"online": bool(st)}
         except Exception as e:
             logger.error("Status check failed: %s", e, exc_info=True)
-            return {"online": False}
+            return {"online": False, "paper": None}
 
     async def _process_queue(self) -> None:
         """Process print queue continuously."""
