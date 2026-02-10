@@ -102,15 +102,9 @@ class AsyncPrinter:
 
     def _do_print(self, wrapped: str) -> None:
         """Blocking print (runs in executor)."""
-        # Encode text using configured code page (default cp1251) so that
-        # Cyrillic and other characters print correctly on the device.
-        data = (wrapped + "\n").encode("ascii", errors="replace")
-        try:
-            # Send raw bytes directly when possible
-            self.printer._raw(data)
-        except Exception:
-            # Fallback: let python-escpos .text handle bytes
-            self.printer.text(data)
+
+        data = (wrapped + "\n")
+        self.printer.textln(data)
         self._cut()
 
     def _cut(self) -> None:

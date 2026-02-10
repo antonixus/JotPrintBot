@@ -52,7 +52,7 @@ MOCK_PRINTER: bool = _parse_bool(os.getenv("MOCK_PRINTER", "false"))
 # Printer font as used by python-escpos (typically "a" or "b")
 FONT: str = os.getenv("FONT", "a").strip()
 DENSITY_LEVEL: int = int(os.getenv("DENSITY_LEVEL", "4").strip())
-CODEPAGE: str = os.getenv("CODEPAGE", "cp1251").strip()
+CODEPAGE: int = os.getenv("CODEPAGE", "6").strip()
 
 # Default text style for python-escpos .set()
 TEXT_UNDERLINE: int = int(os.getenv("TEXT_UNDERLINE", "0").strip())
