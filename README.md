@@ -92,6 +92,14 @@ Edit `.env` in the project root:
 | `FONT`         | No       | Printer font code for python-escpos (default: `a`) |
 | `DENSITY_LEVEL`| No       | Print density 0–8 (default: `4`)                 |
 | `PRINT_RATE_LIMIT_SECONDS` | No | Seconds between prints per user (default: `20`) |
+| `CODEPAGE`     | No       | Text encoding used when sending bytes to the printer (default: `cp1251`) |
+| `TEXT_UNDERLINE`| No      | Default underline mode (0/1) for printer text (default: `0`) |
+| `TEXT_ALIGN`   | No       | Default alignment for printer text: `left`, `center`, or `right` (default: `left`) |
+| `TEXT_WIDTH`   | No       | Default width multiplier for printer text (default: `2`) |
+| `TEXT_HEIGHT`  | No       | Default height multiplier for printer text (default: `2`) |
+| `TEXT_INVERT`  | No       | Default invert mode (0/1) for printer text (default: `0`) |
+| `TEXT_SMOOTH`  | No       | Default smoothing for printer text (default: `false`) |
+| `TEXT_FLIP`    | No       | Default flip mode for printer text (default: `false`) |
 | `SERIAL_BYTESIZE` | No | Serial byte size (default: `8`) |
 | `SERIAL_PARITY` | No | Serial parity (default: `N`) |
 | `SERIAL_STOPBITS` | No | Serial stop bits (default: `1`) |

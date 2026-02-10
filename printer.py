@@ -59,11 +59,21 @@ class AsyncPrinter:
         self.queue: asyncio.Queue[str] = asyncio.Queue()
         self._mock = config.MOCK_PRINTER
 
-        # Basic text style defaults (best-effort; depends on printer profile)
-        # FONT is passed directly to python-escpos (usually "a" or "b")
-        font = config.FONT or "a"
         try:
-            self.printer.set(font=font, density=config.DENSITY_LEVEL)
+            # Basic text style defaults (best-effort; depends on printer profile)
+            # FONT is passed directly to python-escpos (usually "a" or "b")
+            font = config.FONT or "a"
+            self.printer.set(
+                underline=config.TEXT_UNDERLINE,
+                align=config.TEXT_ALIGN,
+                font=font,
+                width=config.TEXT_WIDTH,
+                height=config.TEXT_HEIGHT,
+                density=config.DENSITY_LEVEL,
+                invert=config.TEXT_INVERT,
+                smooth=config.TEXT_SMOOTH,
+                flip=config.TEXT_FLIP,
+            )
         except Exception:
             # Not all backends/printers support all settings
             pass
@@ -91,8 +101,15 @@ class AsyncPrinter:
 
     def _do_print(self, wrapped: str) -> None:
         """Blocking print (runs in executor)."""
-        # Let python-escpos handle encoding / codepage with its defaults
-        self.printer.text(wrapped)
+        # Encode text using configured code page (default cp1251) so that
+        # Cyrillic and other characters print correctly on the device.
+        data = (wrapped + "\n").encode(config.CODEPAGE, errors="replace")
+        try:
+            # Send raw bytes directly when possible
+            self.printer._raw(data)
+        except Exception:
+            # Fallback: let python-escpos .text handle bytes
+            self.printer.text(data)
         self._cut()
 
     def _cut(self) -> None:
