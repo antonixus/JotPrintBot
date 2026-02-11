@@ -2,7 +2,6 @@
 
 import asyncio
 import logging
-import textwrap
 from collections import defaultdict
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -178,12 +177,9 @@ async def handle_message(message: Message) -> None:
         await message.reply("Too long!")
         return
     logger.info("Message received from user %s: %s", message.from_user.id, text[:50])
-    # Set text wrapping width based on printer font:
-    # - FONT=a (Font A): 42 columns
-    # - FONT=b (Font B): 56 columns
-    wrap_width = 42 if config.FONT.lower() == "a" else 56
-    wrapped = textwrap.fill(text, width=wrap_width)
-    await printer.queue.put(wrapped)
+
+    stripped = text.strip()
+    await printer.queue.put(stripped)
     await message.reply("Queued for printing!")
 
 
