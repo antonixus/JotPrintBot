@@ -69,7 +69,7 @@ TEXT_SMOOTH: bool = _parse_bool(os.getenv("TEXT_SMOOTH", "false"))
 TEXT_FLIP: bool = _parse_bool(os.getenv("TEXT_FLIP", "false"))
 PRINT_RATE_LIMIT_SECONDS: int = int(os.getenv("PRINT_RATE_LIMIT_SECONDS", "10").strip())
 # QR code settings
-QR_SIZE: int = int(os.getenv("QR_SIZE", "12").strip())
+QR_SIZE: int = int(os.getenv("QR_SIZE", "3").strip())
 QR_ALIGN: str = os.getenv("QR_ALIGN", "center").strip()
 QR_DENSITY: int = int(os.getenv("QR_DENSITY", "3").strip())
 QR_CENTER: bool = _parse_bool(os.getenv("QR_CENTER", "false"))

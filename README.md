@@ -110,7 +110,7 @@ Edit `.env` in the project root:
 | `SERIAL_STOPBITS` | No | Serial stop bits (default: `1`) |
 | `SERIAL_TIMEOUT` | No | Serial timeout in seconds (default: `1.0`) |
 | `SERIAL_DSRDTR` | No | Enable DSR/DTR flow control (default: `true`) |
-| `QR_SIZE`      | No       | Default QR code module size 1–16 (default: `12`, example: `10`) |
+| `QR_SIZE`      | No       | Default QR code pixel size 1–16 (default: `3`) |
 | `QR_ALIGN`     | No       | Base alignment before printing QR codes: `left`, `center`, or `right` (default: `center`) |
 | `QR_DENSITY`   | No       | Print density used for QR codes (default: `3`) |
 | `QR_CENTER`    | No       | Center QR image when using software-rendered QR (default: `false`, example: `true`) |

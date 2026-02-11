@@ -167,7 +167,7 @@ class AsyncPrinter:
                 data,
                 native=False,
                 size=size,
-                image_arguments=image_arguments,
+                #image_arguments=image_arguments,
             )
         except TypeError:
             # Fallback for older versions without `native` kwarg
