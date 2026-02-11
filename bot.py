@@ -105,9 +105,14 @@ async def status_handler(message: Message) -> None:
     stat = await printer.status()
     online = bool(stat.get("online"))
     paper = stat.get("paper")
-    paper_text = "unknown"
-    if paper in (0, 1, 2):
-        paper_text = f"{paper} (2=adequate, 1=near-end, 0=no paper)"
+    if paper == 2:
+        paper_text = "adequate"
+    elif paper == 1:
+        paper_text = "near-end"
+    elif paper == 0:
+        paper_text = "no paper"
+    else:
+        paper_text = "unknown"
     await message.reply(
         f"Printer online: {online}\n"
         f"Paper status: {paper_text}"

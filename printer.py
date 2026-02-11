@@ -152,7 +152,6 @@ class AsyncPrinter:
 
     def _do_print_qr(self, data: str, size: int) -> None:
         """Blocking QR print (runs in executor)."""
-        self.printer.set(align=config.QR_ALIGN, density=config.QR_DENSITY)
         # Use software-rendered QR (native=False) to get proper UTF-8 encoding.
         # Image printing parameters are controlled via image_arguments according
         # to python-escpos docs (impl, center, high_density_*).
