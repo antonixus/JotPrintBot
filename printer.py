@@ -160,12 +160,14 @@ class AsyncPrinter:
             "center": config.QR_CENTER,
             "high_density_vertical": False,
             "high_density_horizontal": False,
-        }"""
+        } 
+        """
         try:
             self.printer.qr(
                 data,
                 native=False,
                 size=size,
+                center=config.QR_CENTER,
                 #image_arguments=image_arguments,
             )
         except TypeError:
