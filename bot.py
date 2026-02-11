@@ -145,7 +145,7 @@ async def error_handler(event: TelegramObject, exception: Exception) -> None:
 @dp.message(Command("qr"))
 async def qr_handler(message: Message) -> None:
     """Handle /qr command - print a QR code with given text."""
-    text = (message.text or "").partition(" ")[2].strip()
+    text = (message.text or "").strip()
     if not text:
         await message.reply("Usage: /qr your text to encode")
         return
