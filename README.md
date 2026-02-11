@@ -114,7 +114,7 @@ Edit `.env` in the project root:
 | `QR_ALIGN`     | No       | Base alignment before printing QR codes: `left`, `center`, or `right` (default: `center`) |
 | `QR_DENSITY`   | No       | Print density used for QR codes (default: `3`) |
 | `QR_CENTER`    | No       | Center QR image when using software-rendered QR (default: `false`, example: `true`) |
-
+| `QR_IMG_IMPL`  | No       | Image implementation for QR rendering: `bitImageRaster`, `graphics`, or `bitImageColumn` (default: `bitImageRaster`, example: `bitImageColumn`) |
 
 **Raspberry Pi / DietPi:** Enable serial in `raspi-config` → Interface Options → Serial Port.
 

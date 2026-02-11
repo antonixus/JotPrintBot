@@ -155,20 +155,19 @@ class AsyncPrinter:
         # Use software-rendered QR (native=False) to get proper UTF-8 encoding.
         # Image printing parameters are controlled via image_arguments according
         # to python-escpos docs (impl, center, high_density_*).
-        """image_arguments: dict[str, Any] = {
+        image_arguments: dict[str, Any] = {
             "impl": config.QR_IMG_IMPL,
             "center": config.QR_CENTER,
-            "high_density_vertical": False,
-            "high_density_horizontal": False,
+            "high_density_vertical": True,
+            "high_density_horizontal": True,
         } 
-        """
+        
         try:
             self.printer.qr(
                 data,
                 native=False,
                 size=size,
-                center=config.QR_CENTER,
-                #image_arguments=image_arguments,
+                image_arguments=image_arguments,
             )
         except TypeError:
             # Fallback for older versions without `native` kwarg
