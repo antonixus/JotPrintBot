@@ -123,7 +123,13 @@ def create_printer() -> Serial:
         dsrdtr=config.SERIAL_DSRDTR,
         profile=config.PRINTER_PROFILE,
     )
-
+    # If profile doesn’t have width.pixels set, override it.
+    try:
+        if printer.profile.media["width"]["pixels"] in (None, "Unknown"):
+            printer.profile.media["width"]["pixels"] = 384  # 58mm @ 203dpi
+            printer.profile.media["width"]["mm"] = 58
+    except Exception:
+        pass
     # Initialize and set code page (e.g. cp1251) like in `printer.AsyncPrinter`.
     printer._raw(b"\x1b\x40")  # ESC @ (initialize)
     printer._raw(b"\x1bt" + bytes((config.CODEPAGE_ID,)))  # ESC t <n> (codepage)
