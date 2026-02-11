@@ -83,7 +83,7 @@ class AsyncPrinter:
 
             # Basic text style defaults (best-effort; depends on printer profile)
             # FONT is passed directly to python-escpos (usually "a" or "b")
-            font = config.FONT or "a"
+            font = config.FONT or 0
             self.printer.set(
                 underline=config.TEXT_UNDERLINE,
                 align=config.TEXT_ALIGN,
