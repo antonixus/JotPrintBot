@@ -159,8 +159,8 @@ class AsyncPrinter:
         image_arguments: dict[str, Any] = {
             "impl": config.QR_IMG_IMPL,
             "center": config.QR_CENTER,
-            "high_density_vertical": True,
-            "high_density_horizontal": True,
+            "high_density_vertical": False,
+            "high_density_horizontal": False,
         }
         try:
             self.printer.qr(
