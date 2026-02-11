@@ -1,3 +1,16 @@
+## JotPrintBot v0.1.2 – Bugfixes
+
+### Bugfixes
+
+- **Text wrapping behavior**:
+  - Simplified message handling so the bot now forwards the raw, stripped text to `AsyncPrinter`, leaving any wrapping and layout decisions to the printer side.
+  - This avoids double-wrapping and makes manual test scripts (`test_wrapping.py`, `test_encoding.py`) the single source of truth for line width experiments.
+- **Configuration correctness**:
+  - Fixed `MEDIA_WIDTH_MM` in `config.py` to be wired to its own environment variable instead of reusing `MEDIA_WIDTH_PIXELS`.
+  - Adjusted default QR-related settings (`QR_SIZE`, `QR_IMG_IMPL`) to match the actual code defaults used by `AsyncPrinter`.
+- **Documentation consistency**:
+  - Updated README to reference JotPrintBot (new repo name) and corrected examples for manual QR testing to align with the current defaults.
+
 ## JotPrintBot v0.1.1 – QR codes, font-based wrapping, and config tweaks
 
 ### QR code printing
