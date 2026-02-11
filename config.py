@@ -72,6 +72,8 @@ PRINT_RATE_LIMIT_SECONDS: int = int(os.getenv("PRINT_RATE_LIMIT_SECONDS", "10").
 QR_SIZE: int = int(os.getenv("QR_SIZE", "12").strip())
 QR_ALIGN: str = os.getenv("QR_ALIGN", "center").strip()
 QR_DENSITY: int = int(os.getenv("QR_DENSITY", "3").strip())
+QR_CENTER: bool = _parse_bool(os.getenv("QR_CENTER", "false"))
+QR_IMG_IMPL: str = os.getenv("QR_IMG_IMPL", "bitImageRaster").strip()
 
 # Serial line settings for python-escpos Serial printer (optional)
 SERIAL_BYTESIZE: int = int(os.getenv("SERIAL_BYTESIZE", "8").strip())
