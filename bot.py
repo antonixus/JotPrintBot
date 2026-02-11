@@ -105,14 +105,9 @@ async def status_handler(message: Message) -> None:
     stat = await printer.status()
     online = bool(stat.get("online"))
     paper = stat.get("paper")
-    if paper == 2:
-        paper_text = "adequate"
-    elif paper == 1:
-        paper_text = "near-end"
-    elif paper == 0:
-        paper_text = "no paper"
-    else:
-        paper_text = "unknown"
+    paper_text = "unknown"
+    if paper in (0, 1, 2):
+        paper_text = f"{paper} (2=adequate, 1=near-end, 0=no paper)"
     await message.reply(
         f"Printer online: {online}\n"
         f"Paper status: {paper_text}"
@@ -178,9 +173,9 @@ async def handle_message(message: Message) -> None:
         await message.reply("Too long!")
         return
     logger.info("Message received from user %s: %s", message.from_user.id, text[:50])
-    # Set text wrapping
-
-    wrapped = textwrap.fill(text, width=32)
+    # Set text wrapping width based on font: Font A = 32 columns, Font B = 42 columns
+    wrap_width = 32 if config.FONT.lower() == "a" else 42
+    wrapped = textwrap.fill(text, width=wrap_width)
     await printer.queue.put(wrapped)
     await message.reply("Queued for printing!")
 

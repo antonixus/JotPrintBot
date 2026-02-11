@@ -2,7 +2,6 @@
 
 import asyncio
 import logging
-import textwrap
 from typing import Any
 
 import config
@@ -100,8 +99,6 @@ class AsyncPrinter:
             pass
 
     async def print_text(self, text: str) -> None:
-        """Print text with wrapping. Non-blocking."""
-        wrapped = textwrap.fill(text, width=32)
         if self._mock:
             logger.info("Printed (mock): %s", text[:50])
             return
@@ -110,7 +107,7 @@ class AsyncPrinter:
                 await asyncio.get_running_loop().run_in_executor(
                     None,
                     self._do_print,
-                    wrapped,
+                    text,
                 )
                 logger.info("Printed: %s", text[:50])
                 return
@@ -141,10 +138,10 @@ class AsyncPrinter:
                     raise
                 await asyncio.sleep(0.5)
 
-    def _do_print(self, wrapped: str) -> None:
+    def _do_print(self, text: str) -> None:
         """Blocking print (runs in executor)."""
 
-        self.printer.textln(wrapped)
+        self.printer.textln(text)
         self._cut()
 
     def _do_print_qr(self, data: str, size: int) -> None:
