@@ -72,10 +72,10 @@ class TestAsyncPrinterStatus:
     """Tests for AsyncPrinter.status."""
 
     async def test_status_returns_online_true_when_mock(self, mock_config):
-        """Status should return {'online': True} in mock mode."""
+        """Status should return online=True and paper=2 in mock mode."""
         p = AsyncPrinter()
         result = await p.status()
-        assert result == {"online": True}
+        assert result == {"online": True, "paper": 2}
 
     async def test_status_is_async(self, mock_config):
         """status() should be awaitable and return dict."""
@@ -83,3 +83,23 @@ class TestAsyncPrinterStatus:
         result = await p.status()
         assert isinstance(result, dict)
         assert "online" in result
+        assert "paper" in result
+
+
+@pytest.mark.asyncio
+class TestAsyncPrinterPrintQR:
+    """Tests for AsyncPrinter.print_qr."""
+
+    async def test_print_qr_logs_when_mock(self, mock_config, caplog):
+        """Should log 'QR printed (mock)' when printing QR in mock mode."""
+        import logging
+
+        caplog.set_level(logging.INFO)
+        p = AsyncPrinter()
+        await p.print_qr("Привет")
+        assert "QR printed (mock): Привет" in caplog.text
+
+    async def test_print_qr_completes_without_error(self, mock_config):
+        """print_qr should not raise in mock mode."""
+        p = AsyncPrinter()
+        await p.print_qr("Test QR")

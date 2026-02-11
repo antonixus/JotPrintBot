@@ -18,13 +18,16 @@ The bot uses [aiogram](https://docs.aiogram.dev/) for Telegram integration and [
 
 ## Functionality
 
-- **Print text** — Send any text message (up to 1000 characters); it will be wrapped to 32 characters per line and queued for printing
+- **Print text** — Send any text message (up to 1000 characters); it will be wrapped to the printer’s font width and queued for printing:
+  - `FONT=a` (Font A): 42 characters per line
+  - `FONT=b` (Font B): 56 characters per line
 - **Whitelist access** — Only users in the whitelist can use the bot; others receive "Access denied"
-- **Rate limiting** — 1 print per 20 seconds per user by default (configurable)
+- **Rate limiting** — 1 print per 10 seconds per user by default (configurable via `PRINT_RATE_LIMIT_SECONDS`)
 - **Commands:**
   - `/start` — Welcome message and usage instructions
-  - `/status` — Check if the printer is online
+  - `/status` — Check if the printer is online and paper status (adequate / near-end / no paper)
   - `/help` — List commands and limits
+  - `/qr <text>` — Print the given text as a QR code (UTF-8 safe, supports Cyrillic)
 - **Mock mode** — Run without a physical printer for development (`MOCK_PRINTER=true`)
 - **Error handling** — Exceptions are logged and the admin is notified via Telegram
 
@@ -91,14 +94,14 @@ Edit `.env` in the project root:
 | `MOCK_PRINTER` | No       | `true` to run without hardware (default: `false`) |
 | `FONT`         | No       | Printer font code for python-escpos (default: `a`) |
 | `DENSITY_LEVEL`| No       | Print density 0–8 (default: `4`)                 |
-| `PRINT_RATE_LIMIT_SECONDS` | No | Seconds between prints per user (default: `20`) |
+| `PRINT_RATE_LIMIT_SECONDS` | No | Seconds between prints per user (default: `10`) |
 | `CODEPAGE`     | No       | Python codec name for text encoding before sending to printer (default: `cp1251`) |
 | `CODEPAGE_ID`  | No       | ESC/POS code page ID used with `ESC t` (on many printers `6` is cp1251; default: `6`) |
 | `PRINTER_PROFILE` | No    | python-escpos printer profile name (default: `RP326`) |
 | `TEXT_UNDERLINE`| No      | Default underline mode (0/1) for printer text (default: `0`) |
 | `TEXT_ALIGN`   | No       | Default alignment for printer text: `left`, `center`, or `right` (default: `left`) |
-| `TEXT_WIDTH`   | No       | Default width multiplier for printer text (default: `2`) |
-| `TEXT_HEIGHT`  | No       | Default height multiplier for printer text (default: `2`) |
+| `TEXT_WIDTH`   | No       | Default width multiplier for printer text (default: `1`) |
+| `TEXT_HEIGHT`  | No       | Default height multiplier for printer text (default: `1`) |
 | `TEXT_INVERT`  | No       | Default invert mode (0/1) for printer text (default: `0`) |
 | `TEXT_SMOOTH`  | No       | Default smoothing for printer text (default: `false`) |
 | `TEXT_FLIP`    | No       | Default flip mode for printer text (default: `false`) |
@@ -107,6 +110,11 @@ Edit `.env` in the project root:
 | `SERIAL_STOPBITS` | No | Serial stop bits (default: `1`) |
 | `SERIAL_TIMEOUT` | No | Serial timeout in seconds (default: `1.0`) |
 | `SERIAL_DSRDTR` | No | Enable DSR/DTR flow control (default: `true`) |
+| `QR_SIZE`      | No       | Default QR code module size 1–16 (default: `12`, example: `10`) |
+| `QR_ALIGN`     | No       | Base alignment before printing QR codes: `left`, `center`, or `right` (default: `center`) |
+| `QR_DENSITY`   | No       | Print density used for QR codes (default: `3`) |
+| `QR_CENTER`    | No       | Center QR image when using software-rendered QR (default: `false`, example: `true`) |
+| `QR_IMG_IMPL`  | No       | Image implementation for QR rendering: `bitImageRaster`, `graphics`, or `bitImageColumn` (default: `bitImageRaster`, example: `bitImageColumn`) |
 
 **Raspberry Pi / DietPi:** Enable serial in `raspi-config` → Interface Options → Serial Port.
 
@@ -147,15 +155,16 @@ View status: `sudo systemctl status bot`. View logs: `journalctl -u bot -f`.
 
 ### Commands
 
-| Command   | Description                           |
-|-----------|---------------------------------------|
-| `/start`  | Welcome message and basic instructions |
-| `/status` | Check if the printer is online        |
-| `/help`   | List all commands and limits          |
+| Command   | Description                                    |
+|-----------|------------------------------------------------|
+| `/start`  | Welcome message and basic instructions         |
+| `/status` | Check if the printer is online and paper status |
+| `/help`   | List all commands and limits                  |
+| `/qr`     | Print a QR code with the given text           |
 
 ### Limits
 
-- **Rate:** 1 print per 20 seconds per user (default, configurable via `PRINT_RATE_LIMIT_SECONDS`)
+- **Rate:** 1 print per 10 seconds per user (default, configurable via `PRINT_RATE_LIMIT_SECONDS`)
 - **Text length:** Maximum 1000 characters per message
 
 ---
@@ -173,15 +182,23 @@ pytest test/ -v
 ### Run specific test files
 
 ```bash
-pytest test/test_bot.py -v    # Bot handlers, middleware, rate limiting
-pytest test/test_printer.py -v # Printer module with mock
+pytest test/test_printer.py -v   # Printer module with mock (text & QR)
+pytest test/test_wrapping.py -v  # Font-based wrapping expectations
+pytest test/test_encoding.py -v  # Cyrillic encoding on real printer (requires hardware)
 ```
 
 ### Test coverage
 
 Tests cover:
-- **Bot:** Auth and throttling middleware, `/start`, `/status`, `/help`, print queue handler
-- **Printer:** Initialization, `print_text`, `status` in mock mode
+- **Printer (mock):** Initialization, `print_text`, `print_qr`, `status` in mock mode
+- **Wrapping helper scripts:** How many characters fit per line for different fonts
+- **Encoding helper script:** Cyrillic output validation using the configured printer profile and code page
+
+For QR-specific manual testing, you can also use:
+
+```bash
+python -m test.qr_print_test "Привет" --impl bitImageColumn --center
+```
 
 ---
 

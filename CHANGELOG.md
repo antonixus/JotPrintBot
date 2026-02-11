@@ -1,3 +1,52 @@
+## v0.1.1 – QR codes, font-based wrapping, and config tweaks
+
+### QR code printing
+
+- **New `/qr` command**:
+  - Added `/qr <text>` Telegram command to print a QR code for the given text.
+  - Uses software-rendered QR (`native=False`) so QR contents are encoded as UTF‑8 and decode correctly on smartphones, including Cyrillic text (e.g. `Привет`).
+- **QR configuration via `.env`**:
+  - `QR_SIZE` – default QR module size (1–16).
+  - `QR_ALIGN` – base alignment before printing QR codes (`left`, `center`, or `right`).
+  - `QR_DENSITY` – printer density value applied when printing QR codes.
+  - `QR_CENTER` – whether to center QR images when using software-rendered QR.
+  - `QR_IMG_IMPL` – image implementation for QR rendering: `bitImageRaster`, `graphics`, or `bitImageColumn`.
+- **Internal `AsyncPrinter` updates**:
+  - Added `print_qr()` method with retry logic mirroring `print_text()`.
+  - QR printing now uses `image_arguments` to control centering and image implementation, based on the new `.env` settings.
+  - In mock mode, QR prints are logged as `QR printed (mock): ...` for easier testing.
+
+### Text wrapping & font behavior
+
+- **Font-based wrapping in the bot**:
+  - Incoming text is now wrapped based on the configured printer font (`FONT`):
+    - `FONT=a` (Font A): 42 characters per line.
+    - `FONT=b` (Font B): 56 characters per line.
+  - This matches typical capabilities for 57mm ESC/POS printers and better utilizes available width.
+- Updated `test_wrapping` and helper scripts (manual tools) to reflect the expected character counts for different fonts.
+
+### Status output and UX
+
+- **Improved `/status` output**:
+  - The `/status` command now reports paper status as human-readable text instead of raw digits:
+    - `adequate`, `near-end`, or `no paper`.
+- Rate limit documentation was aligned with the current default:
+  - `PRINT_RATE_LIMIT_SECONDS` default is now documented as **10 seconds**.
+
+### QR testing utilities & docs
+
+- Added `test/qr_print_test.py`:
+  - Standalone script for printing a QR code with configurable options:
+    - `--qr-size`, `--impl` (`bitImageRaster`, `graphics`, or `bitImageColumn`),
+    - `--center`, `--high-density-vertical`, `--high-density-horizontal`,
+    - `--density`, and an optional `--native` flag for native QR mode experiments.
+  - Default content is `Привет`, which is useful for visually verifying Cyrillic decoding on smartphones.
+- **README updates**:
+  - Documented the `/qr` command and QR-related `.env` variables.
+  - Updated function descriptions for `/status` and the default rate limit.
+  - Clarified that text wrapping is font-dependent (42/56 columns).
+  - Updated test documentation to include `test_printer.py`, `test_wrapping.py`, `test_encoding.py`, and the QR test script.
+
 ## v0.1.0 – Printer configuration, Cyrillic support, and improved bot UX
 
 ### Printer configuration & encoding
