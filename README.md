@@ -1,11 +1,11 @@
-# Telegram Printer Bot
+# JotPrintBot
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/antonixus/telegram-printer-bot/blob/main/LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/antonixus/JotPrintBot/blob/main/LICENSE)
 
 ## Introduction
 
-**Telegram Printer Bot** is an asynchronous Python application that allows you to print text from Telegram messages to a thermal receipt printer. Send a message to the bot, and it will be printed on paper via a connected ESC/POS thermal printer.
+**JotPrintBot** is an asynchronous Python application that allows you to print text from Telegram messages to a thermal receipt printer. Send a message to the bot, and it will be printed on paper via a connected ESC/POS thermal printer.
 
 **Supported hardware:**
 - **CSN-A2 TTL** thermal printer (and other ESC/POS compatible models)
@@ -52,8 +52,8 @@ sudo apt install -y \
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/antonixus/telegram-printer-bot.git
-cd telegram-printer-bot
+git clone https://github.com/antonixus/JotPrintBot.git
+cd JotPrintBot
 ```
 
 ### 2. Create virtual environment and install dependencies
@@ -197,7 +197,7 @@ Tests cover:
 For QR-specific manual testing, you can also use:
 
 ```bash
-python -m test.qr_print_test "Привет" --impl bitImageColumn --center
+python -m test.qr_print_test "Hello" --impl bitImageColumn --center
 ```
 
 ---

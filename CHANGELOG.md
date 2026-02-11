@@ -1,4 +1,4 @@
-## v0.1.1 – QR codes, font-based wrapping, and config tweaks
+## JotPrintBot v0.1.1 – QR codes, font-based wrapping, and config tweaks
 
 ### QR code printing
 
@@ -41,13 +41,9 @@
     - `--center`, `--high-density-vertical`, `--high-density-horizontal`,
     - `--density`, and an optional `--native` flag for native QR mode experiments.
   - Default content is `Привет`, which is useful for visually verifying Cyrillic decoding on smartphones.
-- **README updates**:
-  - Documented the `/qr` command and QR-related `.env` variables.
-  - Updated function descriptions for `/status` and the default rate limit.
-  - Clarified that text wrapping is font-dependent (42/56 columns).
-  - Updated test documentation to include `test_printer.py`, `test_wrapping.py`, `test_encoding.py`, and the QR test script.
 
-## v0.1.0 – Printer configuration, Cyrillic support, and improved bot UX
+
+## JotPrintBot v0.1.0 – Printer configuration, Cyrillic support, and improved bot UX
 
 ### Printer configuration & encoding
 
