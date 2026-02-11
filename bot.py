@@ -178,9 +178,9 @@ async def handle_message(message: Message) -> None:
         await message.reply("Too long!")
         return
     logger.info("Message received from user %s: %s", message.from_user.id, text[:50])
-    # Set text wrapping width based on font: Font A = 32 columns, Font B = 56 columns
+    # Set text wrapping
 
-    wrapped = textwrap.fill(text)
+    wrapped = textwrap.fill(text, width=32)
     await printer.queue.put(wrapped)
     await message.reply("Queued for printing!")
 
