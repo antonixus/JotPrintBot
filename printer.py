@@ -117,7 +117,7 @@ class AsyncPrinter:
                     raise
                 await asyncio.sleep(0.5)
 
-    async def print_qr(self, data: str, size: int = 8) -> None:
+    async def print_qr(self, data: str, size: int = config.QR_SIZE,qralign: str = config.QR_ALIGN) -> None:
         """Print QR code for the given data. Non-blocking."""
         if self._mock:
             logger.info("QR printed (mock): %s", data[:50])
@@ -129,6 +129,7 @@ class AsyncPrinter:
                     self._do_print_qr,
                     data,
                     size,
+                    qralign,
                 )
                 logger.info("QR printed: %s", data[:50])
                 return
@@ -144,12 +145,13 @@ class AsyncPrinter:
         self.printer.textln(text)
         self._cut()
 
-    def _do_print_qr(self, data: str, size: int) -> None:
+    def _do_print_qr(self, data: str, size: int, qralign: str) -> None:
         """Blocking QR print (runs in executor)."""
-        # python-escpos qr() supports `native` and `size` in recent versions.
+        self.printer.set(align=qralign)
+        # Use software-rendered QR (native=False) to get proper UTF-8 encoding
         # See: https://python-escpos.readthedocs.io/en/latest/user/cli-user.html#qr
         try:
-            self.printer.qr(data, native=True, size=size)
+            self.printer.qr(data, native=False, size=size)
         except TypeError:
             # Fallback for older versions without `native` kwarg
             self.printer.qr(data, size=size)
