@@ -58,6 +58,10 @@ CODEPAGE: str = os.getenv("CODEPAGE", "cp1251").strip()
 CODEPAGE_ID: int = int(os.getenv("CODEPAGE_ID", "6").strip())
 # Printer profile name for python-escpos (e.g. "RP326")
 PRINTER_PROFILE: str = os.getenv("PRINTER_PROFILE", "RP326").strip()
+# Printer media width in pixels
+MEDIA_WIDTH_PIXELS: int = int(os.getenv("MEDIA_WIDTH_PIXELS", "384").strip())
+# Printer media width in mm
+MEDIA_WIDTH_MM: float = float(os.getenv("MEDIA_WIDTH_PIXELS", "58").strip())
 
 # Default text style for python-escpos .set()
 TEXT_UNDERLINE: int = int(os.getenv("TEXT_UNDERLINE", "0").strip())
