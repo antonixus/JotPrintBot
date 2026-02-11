@@ -26,13 +26,14 @@ def main() -> None:
     p._raw(CODEPAGE_CHANGE + bytes((6,)))
 
     p.set(align="left", font="a")
-    p.text("12345678901234567890123456789012   <-- 32 chars\n")
-    p.textln("")
+    p.textln("12345678901234567890123456789012   <-- 32 chars\n")
+    p.ln(count=1)
     p.textln("Should be 32 chars max in Font A")
     p.cut()
 
     p.set(align="left", font="b")
-    p.text("123456789012345678901234567890123456789012   <-- try 42\n")
+    p.textln("123456789012345678901234567890123456789012   <-- try 42\n")
+    p.ln(count=1)
     p.textln("Should fit ~42 chars in Font B")
     p.cut()
 
