@@ -118,7 +118,13 @@ class AsyncPrinter:
                 await asyncio.sleep(0.5)
 
     async def print_qr(self, data: str, size: int = config.QR_SIZE) -> None:
-        """Print QR code for the given data. Non-blocking."""
+        """Print QR code for the given data. Non-blocking.
+
+        Size, centering and image implementation are controlled by config:
+          - config.QR_SIZE: base module size (overridden by `size` arg)
+          - config.QR_CENTER: whether to center the QR image
+          - config.QR_IMG_IMPL: image impl: bitImageRaster / graphics / bitImageColumn
+        """
         if self._mock:
             logger.info("QR printed (mock): %s", data[:50])
             return
@@ -147,10 +153,22 @@ class AsyncPrinter:
     def _do_print_qr(self, data: str, size: int) -> None:
         """Blocking QR print (runs in executor)."""
         self.printer.set(align=config.QR_ALIGN, density=config.QR_DENSITY)
-        # Use software-rendered QR (native=False) to get proper UTF-8 encoding
-        # See: https://python-escpos.readthedocs.io/en/latest/user/cli-user.html#qr
+        # Use software-rendered QR (native=False) to get proper UTF-8 encoding.
+        # Image printing parameters are controlled via image_arguments according
+        # to python-escpos docs (impl, center, high_density_*).
+        image_arguments: dict[str, Any] = {
+            "impl": config.QR_IMG_IMPL,
+            "center": config.QR_CENTER,
+            "high_density_vertical": True,
+            "high_density_horizontal": True,
+        }
         try:
-            self.printer.qr(data, native=False, size=size)
+            self.printer.qr(
+                data,
+                native=False,
+                size=size,
+                image_arguments=image_arguments,
+            )
         except TypeError:
             # Fallback for older versions without `native` kwarg
             self.printer.qr(data, size=size)
