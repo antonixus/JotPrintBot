@@ -69,8 +69,9 @@ TEXT_SMOOTH: bool = _parse_bool(os.getenv("TEXT_SMOOTH", "false"))
 TEXT_FLIP: bool = _parse_bool(os.getenv("TEXT_FLIP", "false"))
 PRINT_RATE_LIMIT_SECONDS: int = int(os.getenv("PRINT_RATE_LIMIT_SECONDS", "10").strip())
 # QR code settings
-QR_SIZE: int = int(os.getenv("QR_SIZE", "16").strip())
+QR_SIZE: int = int(os.getenv("QR_SIZE", "12").strip())
 QR_ALIGN: str = os.getenv("QR_ALIGN", "center").strip()
+QR_DENSITY: int = int(os.getenv("QR_DENSITY", "3").strip())
 
 # Serial line settings for python-escpos Serial printer (optional)
 SERIAL_BYTESIZE: int = int(os.getenv("SERIAL_BYTESIZE", "8").strip())

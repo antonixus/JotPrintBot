@@ -117,7 +117,7 @@ class AsyncPrinter:
                     raise
                 await asyncio.sleep(0.5)
 
-    async def print_qr(self, data: str, size: int = config.QR_SIZE,qralign: str = config.QR_ALIGN) -> None:
+    async def print_qr(self, data: str, size: int = config.QR_SIZE) -> None:
         """Print QR code for the given data. Non-blocking."""
         if self._mock:
             logger.info("QR printed (mock): %s", data[:50])
@@ -129,7 +129,6 @@ class AsyncPrinter:
                     self._do_print_qr,
                     data,
                     size,
-                    qralign,
                 )
                 logger.info("QR printed: %s", data[:50])
                 return
@@ -145,9 +144,9 @@ class AsyncPrinter:
         self.printer.textln(text)
         self._cut()
 
-    def _do_print_qr(self, data: str, size: int, qralign: str) -> None:
+    def _do_print_qr(self, data: str, size: int) -> None:
         """Blocking QR print (runs in executor)."""
-        self.printer.set(align=qralign)
+        self.printer.set(align=config.QR_ALIGN, density=config.QR_DENSITY)
         # Use software-rendered QR (native=False) to get proper UTF-8 encoding
         # See: https://python-escpos.readthedocs.io/en/latest/user/cli-user.html#qr
         try:
