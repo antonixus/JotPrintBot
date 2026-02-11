@@ -180,7 +180,7 @@ def main() -> None:
     try:
         printer.set(
             underline=config.TEXT_UNDERLINE,
-            align="center" if args.center else config.TEXT_ALIGN,
+            align=config.TEXT_ALIGN,
             font=config.FONT,
             width=config.TEXT_WIDTH,
             height=config.TEXT_HEIGHT,
