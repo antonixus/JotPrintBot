@@ -70,13 +70,17 @@ class AsyncPrinter:
                 dsrdtr=config.SERIAL_DSRDTR,
                 profile=config.PRINTER_PROFILE,
             )
-            # If profile doesn’t have width.pixels set, override it.
+            # Attempt to set printer media width (pixels and mm) if not specified in profile.
             try:
-                if self.printer.profile.media["width"]["pixels"] in (None, "Unknown"):
-                    self.printer.profile.media["width"]["pixels"] = config.MEDIA_WIDTH_PIXELS  # 58mm @ 203dpi
+                media = self.printer.profile.media.get("width", {})
+                pixels = media.get("pixels")
+                mm = media.get("mm")
+                if pixels in (None, "Unknown") and config.MEDIA_WIDTH_PIXELS:
+                    self.printer.profile.media["width"]["pixels"] = config.MEDIA_WIDTH_PIXELS
+                if mm in (None, "Unknown") and config.MEDIA_WIDTH_MM:
                     self.printer.profile.media["width"]["mm"] = config.MEDIA_WIDTH_MM
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Could not set printer media width: {e}")
 
         self.queue: asyncio.Queue[str] = asyncio.Queue()
         self._mock = config.MOCK_PRINTER
