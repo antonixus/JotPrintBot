@@ -150,7 +150,7 @@ async def error_handler(event: TelegramObject, exception: Exception) -> None:
 @dp.message(Command("qr"))
 async def qr_handler(message: Message) -> None:
     """Handle /qr command - print a QR code with given text."""
-    text = (message.text or "").strip()
+    text = remove_command_from_message(message.text or "")
     if not text:
         await message.reply("Usage: /qr your text to encode")
         return
@@ -188,6 +188,15 @@ async def handle_message(message: Message) -> None:
     await printer.queue.put(job)
     await message.reply("Queued for printing!")
 
+def remove_command_from_message(message_text: str) -> str:
+    """Remove the leading /command (and its argument) from message.text."""
+    if not message_text:
+        return ""
+    # Remove first token if it starts with "/"
+    tokens = message_text.strip().split(maxsplit=1)
+    if tokens and tokens[0].startswith("/"):
+        return tokens[1] if len(tokens) > 1 else ""
+    return message_text.strip()
 
 # --- Setup ---
 def setup() -> None:
