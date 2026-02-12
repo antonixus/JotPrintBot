@@ -2,9 +2,10 @@
 
 import asyncio
 import logging
-from typing import Any
+from typing import Any, List, Union
 
 import config
+from formatter import PrintJob, QueueItem, Segment
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +83,8 @@ class AsyncPrinter:
             except Exception as e:
                 logger.debug(f"Could not set printer media width: {e}")
 
-        self.queue: asyncio.Queue[str] = asyncio.Queue()
+        # Queue can hold either plain strings or formatted jobs (list[Segment])
+        self.queue: asyncio.Queue[QueueItem] = asyncio.Queue()
         self._mock = config.MOCK_PRINTER
 
         try:
@@ -162,6 +164,97 @@ class AsyncPrinter:
         self.printer.textln(text)
         self._cut()
 
+    async def print_formatted(self, job: PrintJob) -> None:
+        """Print a formatted job (list of segments) asynchronously."""
+
+        if self._mock:
+            preview = "".join(seg.text for seg in job)[:50]
+            logger.info("Printed formatted (mock): %s", preview)
+            return
+
+        for attempt in range(3):
+            try:
+                await asyncio.get_running_loop().run_in_executor(
+                    None,
+                    self._do_print_formatted,
+                    job,
+                )
+                preview = "".join(seg.text for seg in job)[:50]
+                logger.info("Printed formatted: %s", preview)
+                return
+            except Exception as e:
+                logger.error("Formatted print attempt %d failed: %s", attempt + 1, e)
+                if attempt == 2:
+                    raise
+                await asyncio.sleep(0.5)
+
+    def _apply_segment_style(self, seg: Segment) -> None:
+        """Apply ESC/POS style for a single segment."""
+
+        style = seg.style
+        set_kwargs: dict[str, Any] = {}
+
+        if "bold" in style:
+            set_kwargs["bold"] = bool(style["bold"])
+        if "underline" in style:
+            set_kwargs["underline"] = int(style["underline"])
+        if "font" in style:
+            set_kwargs["font"] = str(style["font"])
+
+        if set_kwargs:
+            try:
+                self.printer.set(**set_kwargs)
+            except Exception:
+                # Some profiles may not support all kwargs
+                pass
+
+        # Double-strike for strikethrough.
+        if style.get("double_strike"):
+            try:
+                # ESC G 1  -> enable double-strike
+                self.printer._raw(b"\x1b\x47\x01")
+            except Exception:
+                pass
+
+    def _reset_style(self) -> None:
+        """Reset printer style to defaults from config."""
+
+        try:
+            font = config.FONT or "a"
+            self.printer.set(
+                underline=config.TEXT_UNDERLINE,
+                align=config.TEXT_ALIGN,
+                font=font,
+                width=config.TEXT_WIDTH,
+                height=config.TEXT_HEIGHT,
+                density=config.DENSITY_LEVEL,
+                invert=config.TEXT_INVERT,
+                smooth=config.TEXT_SMOOTH,
+                flip=config.TEXT_FLIP,
+            )
+        except Exception:
+            # Not all printers/profile combinations support all options.
+            pass
+
+        # Always ensure double-strike is turned off after each segment.
+        try:
+            # ESC G 0  -> disable double-strike
+            self.printer._raw(b"\x1b\x47\x00")
+        except Exception:
+            pass
+
+    def _do_print_formatted(self, job: PrintJob) -> None:
+        """Blocking formatted print (runs in executor)."""
+
+        for seg in job:
+            if not seg.text:
+                continue
+            self._apply_segment_style(seg)
+            self.printer.text(seg.text)
+            self._reset_style()
+
+        self._cut()
+
     def _do_print_qr(self, data: str, size: int) -> None:
         """Blocking QR print (runs in executor)."""
         # Use software-rendered QR (native=False) to get proper UTF-8 encoding.
@@ -229,12 +322,19 @@ class AsyncPrinter:
     async def _process_queue(self) -> None:
         """Process print queue continuously."""
         while True:
-            text = await self.queue.get()
+            item: QueueItem = await self.queue.get()
             try:
-                await self.print_text(text)
+                if isinstance(item, str):
+                    await self.print_text(item)
+                else:
+                    await self.print_formatted(item)
             except Exception as e:
+                if isinstance(item, str):
+                    preview = item[:50]
+                else:
+                    preview = "".join(seg.text for seg in item)[:50]
                 logger.error(
-                    "Queue processing failed for text %r: %s", text[:50], e, exc_info=True
+                    "Queue processing failed for job %r: %s", preview, e, exc_info=True
                 )
             finally:
                 self.queue.task_done()

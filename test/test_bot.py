@@ -11,7 +11,9 @@ def patch_config():
     """Patch config for all bot tests."""
     with patch("config.WHITELIST", [111, 222]), patch(
         "config.ADMIN_ID", 999
-    ), patch("printer.config") as pc:
+    ), patch("printer.config") as pc, patch(
+        "config.PRINT_TELEGRAM_FORMATTING", False
+    ):
         pc.MOCK_PRINTER = True
         pc.SERIAL_PORT = "/dev/serial0"
         pc.BAUDRATE = 9600

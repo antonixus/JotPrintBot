@@ -23,6 +23,13 @@ The bot uses [aiogram](https://docs.aiogram.dev/) for Telegram integration and [
   - `FONT=b` (Font B): 56 characters per line
 - **Whitelist access** — Only users in the whitelist can use the bot; others receive "Access denied"
 - **Rate limiting** — 1 print per 10 seconds per user by default (configurable via `PRINT_RATE_LIMIT_SECONDS`)
+- **Telegram formatting → printer styles** (when `PRINT_TELEGRAM_FORMATTING=true`):
+  - `*bold*` → bold / emphasized text
+  - `__underline__` → underlined text
+  - `~strikethrough~` → double‑strike mode (same visual weight as emphasized on CSN‑A2)
+  - `` `code` `` / triple‑backtick blocks → printed with Font **B** (`font='b'`, more compact/monospaced)
+  - `> blockquote` → emphasized text (no extra frame)
+  - `_italic_` entities are currently **ignored** (no rotation/italic on printer)
 - **Commands:**
   - `/start` — Welcome message and usage instructions
   - `/status` — Check if the printer is online and paper status (adequate / near-end / no paper)

@@ -71,7 +71,13 @@ TEXT_HEIGHT: int = int(os.getenv("TEXT_HEIGHT", "1").strip())
 TEXT_INVERT: int = int(os.getenv("TEXT_INVERT", "0").strip())
 TEXT_SMOOTH: bool = _parse_bool(os.getenv("TEXT_SMOOTH", "false"))
 TEXT_FLIP: bool = _parse_bool(os.getenv("TEXT_FLIP", "false"))
+
+# Bot behavior
 PRINT_RATE_LIMIT_SECONDS: int = int(os.getenv("PRINT_RATE_LIMIT_SECONDS", "10").strip())
+# Enable/disable Telegram entity-based formatting → ESC/POS styles
+PRINT_TELEGRAM_FORMATTING: bool = _parse_bool(
+    os.getenv("PRINT_TELEGRAM_FORMATTING", "true")
+)
 # QR code settings
 QR_SIZE: int = int(os.getenv("QR_SIZE", "3").strip())
 QR_ALIGN: str = os.getenv("QR_ALIGN", "center").strip()

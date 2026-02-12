@@ -14,6 +14,7 @@ from aiogram.types import Message, TelegramObject
 
 import config
 from printer import AsyncPrinter
+from formatter import message_to_queue_item, QueueItem
 
 # Rotating file logging
 Path("logs").mkdir(exist_ok=True)
@@ -178,8 +179,13 @@ async def handle_message(message: Message) -> None:
         return
     logger.info("Message received from user %s: %s", message.from_user.id, text[:50])
 
-    stripped = text.strip()
-    await printer.queue.put(stripped)
+    job: QueueItem
+    if config.PRINT_TELEGRAM_FORMATTING:
+        job = message_to_queue_item(message)
+    else:
+        job = (text or "").strip()
+
+    await printer.queue.put(job)
     await message.reply("Queued for printing!")
 
 
