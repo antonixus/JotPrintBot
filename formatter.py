@@ -2,7 +2,7 @@
 
 This module parses Telegram entities (bold, underline, strikethrough, code/pre,
 blockquote) and maps them to ESC/POS style dictionaries suitable for use with
-python-escpos' ``set()`` plus a few custom flags (e.g. ``double_strike``).
+python-escpos' ``set()``.
 
 Italic is intentionally **not** implemented – italic entities are ignored.
 Monospaced/code/pre is rendered using printer font ``'b'`` (Font B).
@@ -85,9 +85,9 @@ def build_print_job(text: str, entities: Sequence[MessageEntity]) -> PrintJob:
 
     - Bold         → style["bold"] = True
     - Underline    → style["underline"] = 1
-    - Strikethrough→ style["double_strike"] = True (printer sends ESC G)
+    - Strikethrough→ style["invert"] = True
     - Code / Pre   → style["font"] = "b"
-    - Blockquote   → style["bold"] = True and style["blockquote"] = True
+    - Blockquote   → style["double_height"] = True and style["double_width"] = True
     - Italic       → ignored
     """
 
@@ -131,14 +131,14 @@ def build_print_job(text: str, entities: Sequence[MessageEntity]) -> PrintJob:
             style["underline"] = 1
 
         if "strikethrough" in active_types:
-            style["double_strike"] = True
+            style["invert"] = True
 
         if "code" in active_types or "pre" in active_types:
             style["font"] = "b"
 
         if "blockquote" in active_types:
-            style["bold"] = True
-            style["blockquote"] = True
+            style["double_height"] = True
+            style["double_width"] = True
 
         # Italic is intentionally ignored.
 

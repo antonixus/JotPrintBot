@@ -42,10 +42,11 @@ def test_message_to_queue_item_no_entities_returns_stripped():
     [
         ("bold", "bold", True),
         ("underline", "underline", 1),
-        ("strikethrough", "double_strike", True),
+        ("strikethrough", "invert", True),
         ("code", "font", "b"),
         ("pre", "font", "b"),
-        ("blockquote", "bold", True),
+        ("blockquote", "double_height", True),
+        ("blockquote", "double_width", True),
     ],
 )
 def test_entity_type_to_style_mapping(etype, key, expected):

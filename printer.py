@@ -200,20 +200,18 @@ class AsyncPrinter:
             set_kwargs["underline"] = int(style["underline"])
         if "font" in style:
             set_kwargs["font"] = str(style["font"])
+        if "double_height" in style:
+            set_kwargs["double_height"] = bool(style["double_height"])
+        if "double_width" in style:
+            set_kwargs["double_width"] = bool(style["double_width"])
+        if "invert" in style:
+            set_kwargs["invert"] = bool(style["invert"])
 
         if set_kwargs:
             try:
                 self.printer.set(**set_kwargs)
             except Exception:
                 # Some profiles may not support all kwargs
-                pass
-
-        # Double-strike for strikethrough.
-        if style.get("double_strike"):
-            try:
-                # ESC G 1  -> enable double-strike
-                self.printer._raw(b"\x1b\x47\x01")
-            except Exception:
                 pass
 
     def _reset_style(self) -> None:
@@ -231,16 +229,11 @@ class AsyncPrinter:
                 invert=config.TEXT_INVERT,
                 smooth=config.TEXT_SMOOTH,
                 flip=config.TEXT_FLIP,
+                double_height=False,
+                double_width=False,
             )
         except Exception:
             # Not all printers/profile combinations support all options.
-            pass
-
-        # Always ensure double-strike is turned off after each segment.
-        try:
-            # ESC G 0  -> disable double-strike
-            self.printer._raw(b"\x1b\x47\x00")
-        except Exception:
             pass
 
     def _do_print_formatted(self, job: PrintJob) -> None:

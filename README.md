@@ -26,10 +26,10 @@ The bot uses [aiogram](https://docs.aiogram.dev/) for Telegram integration and [
 - **Telegram formatting → printer styles** (when `PRINT_TELEGRAM_FORMATTING=true`):
   - `*bold*` → bold / emphasized text
   - `__underline__` → underlined text
-  - `~strikethrough~` → double‑strike mode (same visual weight as emphasized on CSN‑A2)
+  - `~strikethrough~` → inverted text (white‑on‑black style via `invert=True`)
   - `` `code` `` / triple‑backtick blocks → printed with Font **B** (`font='b'`, more compact/monospaced)
-  - `> blockquote` → emphasized text (no extra frame)
-  - `_italic_` entities are currently **ignored** (no rotation/italic on printer)
+  - `> blockquote` → double‑size text (`double_height=True`, `double_width=True`)
+  - `_italic_` entities are currently **ignored**
 - **Commands:**
   - `/start` — Welcome message and usage instructions
   - `/status` — Check if the printer is online and paper status (adequate / near-end / no paper)
