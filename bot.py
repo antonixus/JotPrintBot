@@ -12,6 +12,7 @@ from aiogram import Bot, Dispatcher, BaseMiddleware
 from aiogram.filters import Command
 from aiogram.types import Message, TelegramObject
 from aiogram.enums import ParseMode
+from aiogram.utils.formatting import Text, Bold, Italic, as_marked_list
 
 import config
 from printer import AsyncPrinter
@@ -97,7 +98,8 @@ class ThrottlingMiddleware(BaseMiddleware):
 @dp.message(Command("start"))
 async def start(message: Message) -> None:
     """Handle /start command."""
-    await message.reply("Welcome! Send text to print.")
+    text = Text("Welcome! Send text to print.").as_kwargs()["text"]
+    await message.reply(text)
 
 
 @dp.message(Command("status"))
@@ -114,34 +116,45 @@ async def status_handler(message: Message) -> None:
         paper_text = "no paper"
     else:
         paper_text = "unknown"
-    await message.reply(
-        f"Printer online: {online}\n"
-        f"Paper status: {paper_text}"
+    builder = Text(
+        Bold("Printer online:"),
+        f" {online}\n",
+        Bold("Paper status:"),
+        f" {paper_text}",
     )
+    text = builder.as_kwargs()["text"]
+    await message.reply(text)
 
 
 @dp.message(Command("help"))
 async def help_handler(message: Message) -> None:
     """Handle /help command - list commands and limits."""
     seconds = config.PRINT_RATE_LIMIT_SECONDS
-    help_text = (
-        "*Commands:*\n"
-        "/start - Welcome and usage\n"
-        "/status - Check printer online status\n"
-        "/qr <text> - Print text as a QR code\n"
-        "/help - List commands and limits\n\n"
-        "*Telegram formatting → printer styles (when PRINT_TELEGRAM_FORMATTING=true):*\n"
-        "*bold* → bold / emphasized text\n"
-        "__underline__ → underlined text\n"
-        "~strikethrough~ → inverted text (white‑on‑black style via invert=True)\n"
-        "`code` / triple‑backtick blocks → printed with Font B (font='b', more compact/monospaced)\n"
-        "> blockquote → double‑size text (double_height=True, double_width=True)\n"
-        "_italic_ entities are currently ignored\n\n"
-        "*Limits:*\n"
-        f"• Rate: 1 print per {seconds} seconds\n"
-        "• Text length: max 1000 characters\n"
-        "• QR text length: max 500 characters"
-    )
+    builder = Text(
+        Bold("Commands:"),
+        "\n",
+        "/start - Welcome and usage\n",
+        "/status - Check printer online status\n",
+        "/qr <text> - Print text as a QR code\n",
+        "/help - List commands and limits\n\n",
+        Bold("Telegram formatting \u2192 printer styles (when PRINT_TELEGRAM_FORMATTING=true):"),
+        "\n",
+        "**bold** \u2192 bold / emphasized text\n",
+        "__underline__ \u2192 underlined text\n",
+        "~strikethrough~ \u2192 inverted text (white-on-black style via invert=True)\n",
+        "`code` / triple-backtick blocks \u2192 printed with Font B (font='b', more compact/monospaced)\n",
+        "> blockquote \u2192 double-size text (double_height=True, double_width=True)\n",
+        "_italic_ entities are currently ignored\n\n",
+        Bold("Limits:"),
+        "\n",
+        as_marked_list
+        [
+            f"Rate: 1 print per {seconds} seconds\n",
+            f"Text length: max 1000 characters\n",
+            f"QR text length: max 500 characters",
+        ]
+        ),
+    help_text = builder.as_kwargs()["text"]
     await message.reply(help_text)
 
 
@@ -160,19 +173,25 @@ async def qr_handler(message: Message) -> None:
     """Handle /qr command - print a QR code with given text."""
     text = remove_command_from_message(message.text or "")
     if not text:
-        await message.reply("Usage: /qr your text to encode")
+        reply_text = Text("Usage: /qr your text to encode").as_kwargs()["text"]
+        await message.reply(reply_text)
         return
     if len(text) > 500:
-        await message.reply("QR content too long (max 500 characters).")
+        reply_text = Text("QR content too long (max 500 characters).").as_kwargs()[
+            "text"
+        ]
+        await message.reply(reply_text)
         return
     logger.info("QR request from user %s: %s", message.from_user.id, text[:50])
     try:
         await printer.print_qr(text)
     except Exception as e:
         logger.error("QR print failed: %s", e, exc_info=True)
-        await message.reply("Failed to print QR code.")
+        reply_text = Text("Failed to print QR code.").as_kwargs()["text"]
+        await message.reply(reply_text)
         return
-    await message.reply("QR code sent to printer!")
+    reply_text = Text("QR code sent to printer!").as_kwargs()["text"]
+    await message.reply(reply_text)
 
 
 @dp.message()
@@ -180,10 +199,12 @@ async def handle_message(message: Message) -> None:
     """Handle arbitrary text to print."""
     text = message.text or message.caption or ""
     if not text.strip():
-        await message.reply("Send text to print.")
+        reply_text = Text("Send text to print.").as_kwargs()["text"]
+        await message.reply(reply_text)
         return
     if len(text) > 1000:
-        await message.reply("Too long!")
+        reply_text = Text("Too long!").as_kwargs()["text"]
+        await message.reply(reply_text)
         return
     logger.info("Message received from user %s: %s", message.from_user.id, text[:50])
 
@@ -194,7 +215,8 @@ async def handle_message(message: Message) -> None:
         job = (text or "").strip()
 
     await printer.queue.put(job)
-    await message.reply("Queued for printing!")
+    reply_text = Text("Queued for printing!").as_kwargs()["text"]
+    await message.reply(reply_text)
 
 def remove_command_from_message(message_text: str) -> str:
     """Remove the leading /command (and its argument) from message.text."""
