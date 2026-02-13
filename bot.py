@@ -139,7 +139,7 @@ async def help_handler(message: Message) -> None:
         "/help - List commands and limits\n\n",
         Bold("Telegram formatting \u2192 printer styles (when PRINT_TELEGRAM_FORMATTING=true):"),
         "\n",
-        "**bold** \u2192 bold / emphasized text\n",
+        "*bold* \u2192 bold / emphasized text\n",
         "__underline__ \u2192 underlined text\n",
         "~strikethrough~ \u2192 inverted text (white-on-black style via invert=True)\n",
         "`code` / triple-backtick blocks \u2192 printed with Font B (font='b', more compact/monospaced)\n",
@@ -147,13 +147,13 @@ async def help_handler(message: Message) -> None:
         "_italic_ entities are currently ignored\n\n",
         Bold("Limits:"),
         "\n",
-        as_marked_list
-        [
-            f"Rate: 1 print per {seconds} seconds\n",
-            f"Text length: max 1000 characters\n",
-            f"QR text length: max 500 characters",
-        ]
+        as_marked_list(
+            f"Rate: 1 print per {seconds} seconds",
+            "Text length: max 1000 characters",
+            "QR text length: max 500 characters",
+            marker="• ",
         ),
+    )
     help_text = builder.as_kwargs()["text"]
     await message.reply(help_text)
 
@@ -163,7 +163,8 @@ async def error_handler(event: TelegramObject, exception: Exception) -> None:
     """Notify admin on handler exceptions."""
     logger.exception("Handler error: %s", exception)
     try:
-        await bot.send_message(config.ADMIN_ID, f"Error: {exception}")
+        msg = Text("Error: ", str(exception))
+        await bot.send_message(config.ADMIN_ID, **msg.as_kwargs())
     except Exception:
         pass
 
@@ -248,7 +249,8 @@ async def main() -> None:
     except Exception as e:
         logger.exception("Bot error: %s", e)
         try:
-            await bot.send_message(config.ADMIN_ID, f"Error: {e}")
+            msg = Text("Error: ", str(e))
+            await bot.send_message(config.ADMIN_ID, **msg.as_kwargs())
         except Exception:
             pass
         raise
