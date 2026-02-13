@@ -11,6 +11,7 @@ from typing import Any, Awaitable, Callable
 from aiogram import Bot, Dispatcher, BaseMiddleware
 from aiogram.filters import Command
 from aiogram.types import Message, TelegramObject
+from aiogram.enums import ParseMode
 
 import config
 from printer import AsyncPrinter
@@ -26,7 +27,7 @@ _handler = RotatingFileHandler(
 logging.basicConfig(handlers=[_handler], level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-bot = Bot(token=config.BOT_TOKEN)
+bot = Bot(token=config.BOT_TOKEN, parse_mode=ParseMode.MARKDOWN_V2)
 dp = Dispatcher()
 printer = AsyncPrinter()
 
