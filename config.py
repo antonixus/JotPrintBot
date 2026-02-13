@@ -78,6 +78,11 @@ PRINT_RATE_LIMIT_SECONDS: int = int(os.getenv("PRINT_RATE_LIMIT_SECONDS", "10").
 PRINT_TELEGRAM_FORMATTING: bool = _parse_bool(
     os.getenv("PRINT_TELEGRAM_FORMATTING", "true")
 )
+
+# Per-message header printing (timestamp + @username + rule line)
+PRINT_HEADER_ENABLED: bool = _parse_bool(os.getenv("PRINT_HEADER_ENABLED", "true"))
+# Header horizontal line width (characters); should match your printer/font width
+HEADER_LINE_WIDTH: int = int(os.getenv("HEADER_LINE_WIDTH", "42").strip())
 # QR code settings
 QR_SIZE: int = int(os.getenv("QR_SIZE", "3").strip())
 QR_ALIGN: str = os.getenv("QR_ALIGN", "center").strip()

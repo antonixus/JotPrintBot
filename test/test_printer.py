@@ -33,6 +33,25 @@ class TestAsyncPrinterInit:
         assert p.queue.empty()
         assert p.queue.qsize() == 0
 
+
+@pytest.mark.asyncio
+class TestAsyncPrinterPrintTask:
+    """Tests for AsyncPrinter.print_task (header + payload) in mock mode."""
+
+    async def test_print_task_logs_when_mock(self, mock_config, caplog):
+        import logging
+
+        from print_tasks import HeaderInfo, PrintTask, TextPayload
+
+        caplog.set_level(logging.INFO)
+        p = AsyncPrinter()
+        task = PrintTask(
+            header=HeaderInfo(timestamp="[01.01.26 00:00:00]", user="@tester"),
+            payload=TextPayload(content="Hello"),
+        )
+        await p.print_task(task)
+        assert "Printed task (mock): Hello" in caplog.text
+
     def test_init_sets_mock_flag(self, mock_config):
         """_mock should be True when MOCK_PRINTER=True."""
         p = AsyncPrinter()

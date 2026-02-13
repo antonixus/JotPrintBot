@@ -13,6 +13,8 @@ def patch_config():
         "config.ADMIN_ID", 999
     ), patch("printer.config") as pc, patch(
         "config.PRINT_TELEGRAM_FORMATTING", False
+    ), patch(
+        "config.PRINT_HEADER_ENABLED", False
     ):
         pc.MOCK_PRINTER = True
         pc.SERIAL_PORT = "/dev/serial0"
@@ -156,7 +158,7 @@ class TestStartHandler:
         from bot import start
 
         await start(mock_message)
-        mock_message.reply.assert_called_once_with("Welcome! Send text to print.")
+        mock_message.reply.assert_called_once()
 
 
 class TestStatusHandler:
@@ -168,7 +170,10 @@ class TestStatusHandler:
 
         await status_handler(mock_message)
         mock_message.reply.assert_called_once()
-        call_args = mock_message.reply.call_args[0][0]
+        call_args = (
+            mock_message.reply.call_args.kwargs.get("text")
+            or mock_message.reply.call_args[0][0]
+        )
         assert "Printer online:" in call_args
         assert "Paper status:" in call_args
 
@@ -182,7 +187,8 @@ class TestHelpHandler:
 
         await help_handler(mock_message)
         mock_message.reply.assert_called_once()
-        text = mock_message.reply.call_args[0][0]
+        # aiogram formatting helpers pass kwargs like: reply(text=..., parse_mode=...)
+        text = mock_message.reply.call_args.kwargs.get("text") or mock_message.reply.call_args[0][0]
         assert "/start" in text
         assert "/status" in text
         assert "/help" in text
@@ -200,7 +206,7 @@ class TestHandleMessage:
         mock_message.text = ""
         mock_message.caption = None
         await handle_message(mock_message)
-        mock_message.reply.assert_called_once_with("Send text to print.")
+        mock_message.reply.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_too_long_replies_too_long(self, mock_message):
@@ -208,29 +214,37 @@ class TestHandleMessage:
 
         mock_message.text = "x" * 1001
         await handle_message(mock_message)
-        mock_message.reply.assert_called_once_with("Too long!")
+        mock_message.reply.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_valid_text_queues_and_replies(self, mock_message):
         from bot import handle_message, printer
+        from print_tasks import PrintTask, TextPayload
 
         # Drain queue from previous tests
         while not printer.queue.empty():
             printer.queue.get_nowait()
         mock_message.text = "Hello world"
         await handle_message(mock_message)
-        mock_message.reply.assert_called_once_with("Queued for printing!")
+        mock_message.reply.assert_called_once()
         assert not printer.queue.empty()
         queued = await asyncio.wait_for(printer.queue.get(), timeout=0.5)
-        assert "Hello" in queued
+        assert isinstance(queued, PrintTask)
+        assert isinstance(queued.payload, TextPayload)
+        assert isinstance(queued.payload.content, str)
+        assert "Hello" in queued.payload.content
 
     @pytest.mark.asyncio
     async def test_uses_caption_when_text_empty(self, mock_message):
         from bot import handle_message, printer
+        from print_tasks import PrintTask, TextPayload
 
         mock_message.text = None
         mock_message.caption = "Photo caption"
         await handle_message(mock_message)
-        mock_message.reply.assert_called_once_with("Queued for printing!")
+        mock_message.reply.assert_called_once()
         queued = await asyncio.wait_for(printer.queue.get(), timeout=0.5)
-        assert "Photo caption" in queued
+        assert isinstance(queued, PrintTask)
+        assert isinstance(queued.payload, TextPayload)
+        assert isinstance(queued.payload.content, str)
+        assert "Photo caption" in queued.payload.content

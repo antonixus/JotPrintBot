@@ -102,6 +102,8 @@ Edit `.env` in the project root:
 | `FONT`         | No       | Printer font code for python-escpos (default: `a`) |
 | `DENSITY_LEVEL`| No       | Print density 0–8 (default: `4`)                 |
 | `PRINT_RATE_LIMIT_SECONDS` | No | Seconds between prints per user (default: `10`) |
+| `PRINT_HEADER_ENABLED` | No | Print a header before every print (default: `true`) |
+| `HEADER_LINE_WIDTH` | No | Header rule width in characters (default: `42`) |
 | `CODEPAGE`     | No       | Python codec name for text encoding before sending to printer (default: `cp1251`) |
 | `CODEPAGE_ID`  | No       | ESC/POS code page ID used with `ESC t` (on many printers `6` is cp1251; default: `6`) |
 | `PRINTER_PROFILE` | No    | python-escpos printer profile name (default: `RP326`) |

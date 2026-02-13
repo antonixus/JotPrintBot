@@ -18,6 +18,15 @@ from aiogram.utils.formatting import Text, Bold
 import config
 from printer import AsyncPrinter
 from formatter import message_to_queue_item, QueueItem
+from print_tasks import HeaderInfo, PrintTask, QrPayload, TextPayload
+
+
+def _build_header_info(message: Message) -> HeaderInfo:
+    dt = message.date.astimezone()
+    ts = dt.strftime("[%d.%m.%y %H:%M:%S]")
+    username = getattr(message.from_user, "username", None)
+    user = f"@{username}" if username else f"@id{message.from_user.id}"
+    return HeaderInfo(timestamp=ts, user=user)
 
 # Rotating file logging
 Path("logs").mkdir(exist_ok=True)
@@ -179,13 +188,10 @@ async def qr_handler(message: Message) -> None:
         await message.reply(**Text("QR content too long (max 500 characters).").as_kwargs())
         return
     logger.info("QR request from user %s: %s", message.from_user.id, text[:50])
-    try:
-        await printer.print_qr(text)
-    except Exception as e:
-        logger.error("QR print failed: %s", e, exc_info=True)
-        await message.reply(**Text("Failed to print QR code.").as_kwargs())
-        return
-    await message.reply(**Text("QR code sent to printer!").as_kwargs())
+    header = _build_header_info(message) if config.PRINT_HEADER_ENABLED else None
+    task = PrintTask(header=header, payload=QrPayload(data=text))
+    await printer.queue.put(task)
+    await message.reply(**Text("QR code queued for printing!").as_kwargs())
 
 
 @dp.message()
@@ -206,7 +212,9 @@ async def handle_message(message: Message) -> None:
     else:
         job = (text or "").strip()
 
-    await printer.queue.put(job)
+    header = _build_header_info(message) if config.PRINT_HEADER_ENABLED else None
+    task = PrintTask(header=header, payload=TextPayload(content=job))
+    await printer.queue.put(task)
     await message.reply(**Text("Queued for printing!").as_kwargs())
 
 def remove_command_from_message(message_text: str) -> str:

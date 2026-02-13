@@ -5,7 +5,8 @@ import logging
 from typing import Any, List, Union
 
 import config
-from formatter import PrintJob, QueueItem, Segment
+from formatter import PrintJob, Segment
+from print_tasks import HeaderInfo, PrintTask, QrPayload, TextPayload
 
 logger = logging.getLogger(__name__)
 
@@ -83,8 +84,8 @@ class AsyncPrinter:
             except Exception as e:
                 logger.debug(f"Could not set printer media width: {e}")
 
-        # Queue can hold either plain strings or formatted jobs (list[Segment])
-        self.queue: asyncio.Queue[QueueItem] = asyncio.Queue()
+        # Queue holds PrintTask objects (optional header + payload)
+        self.queue: asyncio.Queue[PrintTask] = asyncio.Queue()
         self._mock = config.MOCK_PRINTER
 
         try:
@@ -127,6 +128,91 @@ class AsyncPrinter:
                 return
             except Exception as e:
                 logger.error("Print attempt %d failed: %s", attempt + 1, e)
+                if attempt == 2:
+                    raise
+                await asyncio.sleep(0.5)
+
+    def _print_header(self, header: HeaderInfo) -> None:
+        """Print per-message header (font B), then reset styles."""
+
+        width = int(getattr(config, "HEADER_LINE_WIDTH", 42))
+
+        try:
+            self.printer.set(font="b")
+        except Exception:
+            pass
+
+        line1 = f"{header.timestamp} {header.user}"[:width]
+        self.printer.textln(line1)
+        self.printer.textln("-" * width)
+        self.printer.textln("")
+
+        self._reset_style()
+
+    def _do_print_task(self, task: PrintTask) -> None:
+        """Blocking task print (runs in executor)."""
+
+        if task.header is not None:
+            self._print_header(task.header)
+
+        payload = task.payload
+        if isinstance(payload, TextPayload):
+            content = payload.content
+            if isinstance(content, str):
+                self.printer.textln(content)
+            else:
+                for seg in content:
+                    if not seg.text:
+                        continue
+                    self._apply_segment_style(seg)
+                    self.printer.text(seg.text)
+                    self._reset_style()
+        else:
+            # QrPayload
+            data = payload.data
+            size = config.QR_SIZE
+            image_arguments: dict[str, Any] = {
+                "impl": config.QR_IMG_IMPL,
+                "center": config.QR_CENTER,
+                "high_density_vertical": True,
+                "high_density_horizontal": True,
+            }
+            try:
+                self.printer.qr(
+                    data,
+                    native=False,
+                    size=size,
+                    image_arguments=image_arguments,
+                )
+            except TypeError:
+                self.printer.qr(data, size=size)
+
+        self._cut()
+
+    async def print_task(self, task: PrintTask) -> None:
+        """Print a PrintTask (optional header + payload) asynchronously."""
+
+        if self._mock:
+            preview: str
+            if isinstance(task.payload, QrPayload):
+                preview = f"QR:{task.payload.data[:40]}"
+            elif isinstance(task.payload.content, str):
+                preview = task.payload.content[:40]
+            else:
+                preview = "".join(seg.text for seg in task.payload.content)[:40]
+            logger.info("Printed task (mock): %s", preview)
+            return
+
+        for attempt in range(3):
+            try:
+                await asyncio.get_running_loop().run_in_executor(
+                    None,
+                    self._do_print_task,
+                    task,
+                )
+                return
+            except Exception as e:
+                logger.error("Task print attempt %d failed: %s", attempt + 1, e)
                 if attempt == 2:
                     raise
                 await asyncio.sleep(0.5)
@@ -315,19 +401,10 @@ class AsyncPrinter:
     async def _process_queue(self) -> None:
         """Process print queue continuously."""
         while True:
-            item: QueueItem = await self.queue.get()
+            task: PrintTask = await self.queue.get()
             try:
-                if isinstance(item, str):
-                    await self.print_text(item)
-                else:
-                    await self.print_formatted(item)
+                await self.print_task(task)
             except Exception as e:
-                if isinstance(item, str):
-                    preview = item[:50]
-                else:
-                    preview = "".join(seg.text for seg in item)[:50]
-                logger.error(
-                    "Queue processing failed for job %r: %s", preview, e, exc_info=True
-                )
+                logger.error("Queue processing failed for task %r: %s", task, e, exc_info=True)
             finally:
                 self.queue.task_done()
