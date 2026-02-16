@@ -1,4 +1,4 @@
-## JotPrintBot v0.1.3 – Per-message headers and unified print queue
+## JotPrintBot v0.1.3 – Per-message headers, text formatting and unified print queue
 
 ### Per-message header feature
 
@@ -24,8 +24,15 @@
   - Text and QR handlers now build `PrintTask` objects with optional headers based on `PRINT_HEADER_ENABLED`.
   - Queue integration remains the same (`printer.queue.put(task)`), but now uses the unified `PrintTask` model.
 
-### Formatter improvements
+### Text formatting
 
+- **Telegram formatting → printer styles** (when `PRINT_TELEGRAM_FORMATTING=true`):
+  - `*bold*` → bold / emphasized text
+  - `__underline__` → underlined text
+  - `~strikethrough~` → inverted text (white‑on‑black style via `invert=True`)
+  - `` `code` `` / triple‑backtick blocks → printed with Font **B** (`font='b'`, more compact/monospaced)
+  - `> blockquote` → double‑size text (`double_height=True`, `double_width=True`)
+  - `_italic_` entities are currently **ignored**
 - **Telegram entity parsing**:
   - Improved UTF-16 code unit to Python string index conversion for accurate entity range extraction.
   - Better handling of edge cases (empty text, malformed entities, missing entity lists).
