@@ -149,7 +149,7 @@ class AsyncPrinter:
 
         line1 = f"{header.timestamp} {header.user}"[:width]
         self.printer.textln(line1)
-        self.printer.textln("─" * width)
+        self.printer.textln("-" * width)
         self.printer.textln("")
 
         self._reset_style()
