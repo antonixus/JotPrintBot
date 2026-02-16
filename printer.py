@@ -191,6 +191,8 @@ class AsyncPrinter:
                 )
             except TypeError:
                 self.printer.qr(data, size=size)
+            # Reset printer state after QR printing (QR uses image printing when native=False)
+            self._reset_style()
         elif isinstance(payload, ImagePayload):
             # ImagePayload
             self._do_print_image(payload.image_path)
@@ -414,6 +416,10 @@ class AsyncPrinter:
                 high_density_vertical=True,
                 high_density_horizontal=True,
             )
+            
+            # Reset printer state after image printing to prevent garbled text
+            # Image printing may leave printer in graphics mode or with modified density
+            self._reset_style()
         finally:
             # Always delete temp file, even on error
             try:
