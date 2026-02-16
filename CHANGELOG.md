@@ -1,3 +1,60 @@
+## JotPrintBot v0.1.3 – Per-message headers and unified print queue
+
+### Per-message header feature
+
+- **Optional header before each print**:
+  - Added `PRINT_HEADER_ENABLED` (default: `true`) to control whether a header is printed before each message.
+  - Header includes: timestamp (`[DD.MM.YY HH:MM:SS]`), Telegram username (`@username` or `@id123456`), horizontal rule line, and blank line.
+  - Header is printed using Font B (`font='b'`) for better readability.
+- **Header configuration via `.env`**:
+  - `PRINT_HEADER_ENABLED` – enable/disable header printing (default: `true`).
+  - `HEADER_LINE_WIDTH` – width of the horizontal rule line in characters (default: `42`, should match your printer font width).
+- **Unified print queue model**:
+  - Introduced `print_tasks.py` with dataclasses: `HeaderInfo`, `TextPayload`, `QrPayload`, `PrintTask`.
+  - All print operations (text, formatted text, QR codes) now use the same `PrintTask(header, payload)` structure.
+  - Header is optional (`header: HeaderInfo | None`), allowing the same queue model for all print types.
+
+### Bot improvements
+
+- **Enhanced error handling**:
+  - Bot now uses aiogram formatting helpers (`Text`, `Bold`) with `ParseMode.MARKDOWN_V2` for consistent message formatting.
+  - Error messages sent to admin are properly escaped for MARKDOWN_V2 syntax.
+  - Improved error handling in `/start` and `/help` handlers.
+- **Message handling**:
+  - Text and QR handlers now build `PrintTask` objects with optional headers based on `PRINT_HEADER_ENABLED`.
+  - Queue integration remains the same (`printer.queue.put(task)`), but now uses the unified `PrintTask` model.
+
+### Formatter improvements
+
+- **Telegram entity parsing**:
+  - Improved UTF-16 code unit to Python string index conversion for accurate entity range extraction.
+  - Better handling of edge cases (empty text, malformed entities, missing entity lists).
+  - Formatter now correctly handles both `message.entities` and `message.caption_entities`.
+
+### Printer module updates
+
+- **Unified print task processing**:
+  - `AsyncPrinter._do_print_task()` now handles `PrintTask` objects with optional headers.
+  - Header is printed first (if present) using `_print_header()`, then payload (text or QR) is printed.
+  - Style reset after header ensures payload printing starts with clean defaults.
+- **Mock mode support**:
+  - Mock printer logs `Printed task (mock): ...` with preview of payload content (text or QR).
+  - Header printing is skipped in mock mode (header info is still logged in task preview).
+
+### Testing
+
+- **Extended test coverage**:
+  - Added tests for `PrintTask` model and header functionality in `test_bot.py` and `test_printer.py`.
+  - Tests verify that headers are included/excluded based on `PRINT_HEADER_ENABLED` config.
+  - Formatter tests cover UTF-16 range conversion and entity mapping edge cases.
+
+### Internal refactors
+
+- **Code organization**:
+  - Moved print task model to dedicated `print_tasks.py` module for better separation of concerns.
+  - Header building logic centralized in `_build_header_info()` helper function.
+  - Consistent use of dataclasses (`@dataclass(frozen=True)`) for immutable task models.
+
 ## JotPrintBot v0.1.2 – Bugfixes
 
 ### Bugfixes
