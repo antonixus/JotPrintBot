@@ -309,6 +309,7 @@ class AsyncPrinter:
                 underline=config.TEXT_UNDERLINE,
                 align=config.TEXT_ALIGN,
                 font=font,
+                bold=False,
                 width=config.TEXT_WIDTH,
                 height=config.TEXT_HEIGHT,
                 density=config.DENSITY_LEVEL,
