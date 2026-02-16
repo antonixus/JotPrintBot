@@ -191,8 +191,8 @@ class AsyncPrinter:
                 )
             except TypeError:
                 self.printer.qr(data, size=size)
-            # Reset printer state after QR printing (QR uses image printing when native=False)
-            self._reset_style()
+            # Re-initialize after QR (uses image mode when native=False)
+            self._reinitialize_printer()
         elif isinstance(payload, ImagePayload):
             # ImagePayload
             self._do_print_image(payload.image_path)
@@ -319,6 +319,23 @@ class AsyncPrinter:
                 # Some profiles may not support all kwargs
                 pass
 
+    def _reinitialize_printer(self) -> None:
+        """Send ESC/POS initialize sequence to clear graphics mode and reset printer state.
+
+        Use after image/QR printing; some printers (e.g. CSN-A2) stay in graphics mode
+        until ESC @ (Initialize) is sent, causing garbled text until power cycle.
+        """
+        if self._mock:
+            return
+        try:
+            # ESC @ — Initialize: clears buffer, resets all modes (like power-on)
+            self.printer._raw(b"\x1b\x40")
+            # ESC t <n> — Select code page (e.g. 6 = cp1251 for Cyrillic)
+            self.printer._raw(b"\x1bt" + bytes((config.CODEPAGE_ID,)))
+            self._reset_style()
+        except Exception as e:
+            logger.warning("Printer re-initialize failed: %s", e)
+
     def _reset_style(self) -> None:
         """Reset printer style to defaults from config."""
 
@@ -417,9 +434,8 @@ class AsyncPrinter:
                 high_density_horizontal=True,
             )
             
-            # Reset printer state after image printing to prevent garbled text
-            # Image printing may leave printer in graphics mode or with modified density
-            self._reset_style()
+            # Full re-initialize after image: ESC @ clears graphics mode so next text prints correctly
+            self._reinitialize_printer()
         finally:
             # Always delete temp file, even on error
             try:
