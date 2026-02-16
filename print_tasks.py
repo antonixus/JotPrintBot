@@ -29,7 +29,12 @@ class QrPayload:
 
 
 @dataclass(frozen=True)
+class ImagePayload:
+    image_path: str
+
+
+@dataclass(frozen=True)
 class PrintTask:
     header: HeaderInfo | None
-    payload: Union[TextPayload, QrPayload]
+    payload: Union[TextPayload, QrPayload, ImagePayload]
 

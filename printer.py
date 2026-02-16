@@ -2,11 +2,13 @@
 
 import asyncio
 import logging
+import os
+from pathlib import Path
 from typing import Any, List, Union
 
 import config
 from formatter import PrintJob, Segment
-from print_tasks import HeaderInfo, PrintTask, QrPayload, TextPayload
+from print_tasks import HeaderInfo, PrintTask, QrPayload, TextPayload, ImagePayload
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +48,9 @@ class MockPrinter:
 
     def qr(self, data: str, native: bool = True, size: int = 8) -> None:
         """No-op stub for QR codes."""
+
+    def image(self, img_source: Any, **kwargs: Any) -> None:
+        """No-op stub for image printing."""
 
 
 class AsyncPrinter:
@@ -167,7 +172,7 @@ class AsyncPrinter:
                     self._apply_segment_style(seg)
                     self.printer.text(seg.text)
                     self._reset_style()
-        else:
+        elif isinstance(payload, QrPayload):
             # QrPayload
             data = payload.data
             size = config.QR_SIZE
@@ -186,6 +191,11 @@ class AsyncPrinter:
                 )
             except TypeError:
                 self.printer.qr(data, size=size)
+        elif isinstance(payload, ImagePayload):
+            # ImagePayload
+            self._do_print_image(payload.image_path)
+        else:
+            raise ValueError(f"Unknown payload type: {type(payload)}")
 
         self._cut()
 
@@ -196,6 +206,13 @@ class AsyncPrinter:
             preview: str
             if isinstance(task.payload, QrPayload):
                 preview = f"QR:{task.payload.data[:40]}"
+            elif isinstance(task.payload, ImagePayload):
+                preview = f"Image:{task.payload.image_path}"
+                # Delete temp file in mock mode too
+                try:
+                    Path(task.payload.image_path).unlink(missing_ok=True)
+                except Exception as e:
+                    logger.warning("Failed to delete temp image file in mock: %s", e)
             elif isinstance(task.payload.content, str):
                 preview = task.payload.content[:40]
             else:
@@ -358,6 +375,51 @@ class AsyncPrinter:
             # Fallback for older versions without `native` kwarg
             self.printer.qr(data, size=size)
         self._cut()
+
+    def _do_print_image(self, image_path: str) -> None:
+        """Blocking image print (runs in executor).
+
+        Opens image with PIL, handles orientation (rotate landscape 90° CW),
+        resizes to printer width (384 dots for CSN-A2), sets density, and prints.
+        Deletes temp file after printing (or on error).
+        """
+        from PIL import Image
+
+        try:
+            # Open and convert to RGB (CSN-A2 is B&W but PIL handles conversion)
+            img = Image.open(image_path).convert("RGB")
+            w, h = img.size
+
+            # Rotate landscape images 90° clockwise (PIL rotate is CCW, so -90 = CW)
+            if w > h:
+                img = img.rotate(-90, expand=True)
+                w, h = img.size
+
+            # Resize to printer width (384 dots for CSN-A2) while preserving aspect ratio
+            target_width = getattr(config, "IMAGE_PRINT_WIDTH", 384)
+            if w != target_width:
+                ratio = target_width / w
+                new_height = int(h * ratio)
+                img = img.resize((target_width, new_height), Image.Resampling.LANCZOS)
+
+            # Set print density before printing
+            self.printer.set(density=config.IMAGE_DENSITY)
+
+            # Print image with configured parameters
+            self.printer.image(
+                img,
+                impl=config.IMAGE_IMPL,
+                fragment_height=config.IMAGE_FRAGMENT_HEIGHT,
+                center=config.IMAGE_CENTER,
+                high_density_vertical=True,
+                high_density_horizontal=True,
+            )
+        finally:
+            # Always delete temp file, even on error
+            try:
+                Path(image_path).unlink(missing_ok=True)
+            except Exception as e:
+                logger.warning("Failed to delete temp image file %s: %s", image_path, e)
 
     def _cut(self) -> None:
         """Cut paper with python-escpos version compatibility."""

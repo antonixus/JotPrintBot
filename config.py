@@ -90,6 +90,13 @@ QR_DENSITY: int = int(os.getenv("QR_DENSITY", "3").strip())
 QR_CENTER: bool = _parse_bool(os.getenv("QR_CENTER", "false"))
 QR_IMG_IMPL: str = os.getenv("QR_IMG_IMPL", "bitImageColumn").strip()
 
+# Image printing (ESC/POS bit-image)
+IMAGE_IMPL: str = os.getenv("IMAGE_IMPL", "bitImageRaster").strip()
+IMAGE_FRAGMENT_HEIGHT: int = int(os.getenv("IMAGE_FRAGMENT_HEIGHT", "960").strip())
+IMAGE_CENTER: bool = _parse_bool(os.getenv("IMAGE_CENTER", "false"))
+IMAGE_DENSITY: int = int(os.getenv("IMAGE_DENSITY", "5").strip())
+IMAGE_PRINT_WIDTH: int = int(os.getenv("IMAGE_PRINT_WIDTH", "384").strip())  # CSN-A2 48mm @ 8 dots/mm
+
 # Serial line settings for python-escpos Serial printer (optional)
 SERIAL_BYTESIZE: int = int(os.getenv("SERIAL_BYTESIZE", "8").strip())
 SERIAL_PARITY: str = os.getenv("SERIAL_PARITY", "N").strip().upper()

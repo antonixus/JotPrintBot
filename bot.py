@@ -2,13 +2,15 @@
 
 import asyncio
 import logging
+import tempfile
+import uuid
 from collections import defaultdict
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from time import time
 from typing import Any, Awaitable, Callable
 
-from aiogram import Bot, Dispatcher, BaseMiddleware
+from aiogram import Bot, Dispatcher, BaseMiddleware, F
 from aiogram.filters import Command
 from aiogram.types import Message, TelegramObject
 from aiogram.enums import ParseMode
@@ -18,7 +20,7 @@ from aiogram.utils.formatting import Text, Bold
 import config
 from printer import AsyncPrinter
 from formatter import message_to_queue_item, QueueItem
-from print_tasks import HeaderInfo, PrintTask, QrPayload, TextPayload
+from print_tasks import HeaderInfo, PrintTask, QrPayload, TextPayload, ImagePayload
 
 
 def _build_header_info(message: Message) -> HeaderInfo:
@@ -192,6 +194,34 @@ async def qr_handler(message: Message) -> None:
     task = PrintTask(header=header, payload=QrPayload(data=text))
     await printer.queue.put(task)
     await message.reply(**Text("QR code queued for printing!").as_kwargs())
+
+
+@dp.message(F.photo)
+async def photo_handler(message: Message) -> None:
+    """Handle photo messages - download and queue for printing."""
+    # Get largest photo size (F.photo filter ensures message.photo exists)
+    photo = message.photo[-1]
+
+    # Create temporary file path
+    path = Path(tempfile.gettempdir()) / f"jotprint_{uuid.uuid4().hex}.jpg"
+
+    try:
+        # Download photo to temp file
+        file = await bot.get_file(photo.file_id)
+        await bot.download_file(file.file_path, path)
+        logger.info("Photo downloaded from user %s: %s", message.from_user.id, path)
+    except Exception as e:
+        logger.exception("Photo download failed: %s", e)
+        await message.reply(**Text("Failed to download image.").as_kwargs())
+        return
+
+    # Build header if enabled
+    header = _build_header_info(message) if config.PRINT_HEADER_ENABLED else None
+
+    # Enqueue print task
+    task = PrintTask(header=header, payload=ImagePayload(image_path=str(path)))
+    await printer.queue.put(task)
+    await message.reply(**Text("Image queued for printing!").as_kwargs())
 
 
 @dp.message()

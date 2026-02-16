@@ -126,6 +126,11 @@ Edit `.env` in the project root:
 | `QR_DENSITY`   | No       | Print density used for QR codes (default: `3`) |
 | `QR_CENTER`    | No       | Center QR image when using software-rendered QR (default: `false`, example: `true`) |
 | `QR_IMG_IMPL`  | No       | Image implementation for QR rendering: `bitImageRaster`, `graphics`, or `bitImageColumn` (default: `bitImageRaster`, example: `bitImageColumn`) |
+| `IMAGE_IMPL`   | No       | ESC/POS image command for image printing: `bitImageRaster`, `graphics`, or `bitImageColumn` (default: `bitImageRaster`) |
+| `IMAGE_FRAGMENT_HEIGHT` | No | Max height per fragment for large images (default: `960`) |
+| `IMAGE_CENTER` | No       | Center image horizontally (requires `MEDIA_WIDTH_PIXELS` to be set; default: `false`) |
+| `IMAGE_DENSITY` | No      | Print density for images (0–8, default: `5`) |
+| `IMAGE_PRINT_WIDTH` | No | Target width in pixels for image resizing (default: `384` for CSN-A2) |
 
 **Raspberry Pi / DietPi:** Enable serial in `raspi-config` → Interface Options → Serial Port.
 
@@ -177,6 +182,26 @@ View status: `sudo systemctl status bot`. View logs: `journalctl -u bot -f`.
 
 - **Rate:** 1 print per 10 seconds per user (default, configurable via `PRINT_RATE_LIMIT_SECONDS`)
 - **Text length:** Maximum 1000 characters per message
+
+### Image Printing
+
+Send a photo to the bot to print it. The image will be:
+
+- **Automatically resized** to the printer width (384 pixels for CSN-A2, configurable via `IMAGE_PRINT_WIDTH`)
+- **Orientation handling:** Landscape images are rotated 90° clockwise before printing
+- **Aspect ratio preserved:** Images are scaled proportionally to fit the printer width
+- **Fragmentation:** Large images are automatically split into fragments (configurable via `IMAGE_FRAGMENT_HEIGHT`)
+
+**Supported formats:** JPEG, PNG (as sent by Telegram)
+
+**Configuration options** (in `.env`):
+- `IMAGE_IMPL`: Image printing command (`bitImageRaster`, `graphics`, or `bitImageColumn`)
+- `IMAGE_FRAGMENT_HEIGHT`: Maximum height per fragment (default: `960`)
+- `IMAGE_CENTER`: Center image horizontally (requires `MEDIA_WIDTH_PIXELS`; default: `false`)
+- `IMAGE_DENSITY`: Print density 0–8 (default: `5`)
+- `IMAGE_PRINT_WIDTH`: Target width in pixels (default: `384` for CSN-A2)
+
+**Note:** Pillow is required for image processing and is listed in `requirements.txt`. On Raspberry Pi, ensure system libraries for Pillow are installed (see Installation section).
 
 ---
 
