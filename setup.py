@@ -11,26 +11,44 @@ from pathlib import Path
 DIRS = ["logs"]
 
 # Default .env template (placeholders, safe for first-run)
-ENV_TEMPLATE = """# Telegram Printer Bot - Production Config
-# Replace placeholders before running
+ENV_TEMPLATE = """# JotPrintBot (.env)
+# Replace placeholders before running.
 
+# ---------------------------------------------------------------------------
+# Core bot / security
+# ---------------------------------------------------------------------------
 BOT_TOKEN=YOUR_BOT_TOKEN_FROM_BOTFATHER
 ADMIN_ID=YOUR_TELEGRAM_USER_ID
-SERIAL_PORT=/dev/serial0
-BAUDRATE=9600
+# Comma-separated IDs OR a JSON-like list (both are supported by config parser)
 WHITELIST=YOUR_TELEGRAM_USER_ID
 MOCK_PRINTER=false
 PRINT_RATE_LIMIT_SECONDS=20
+
+# ---------------------------------------------------------------------------
+# Printer connection (Serial / UART)
+# ---------------------------------------------------------------------------
+SERIAL_PORT=/dev/serial0
+BAUDRATE=9600
 SERIAL_BYTESIZE=8
 SERIAL_PARITY=N
 SERIAL_STOPBITS=1
 SERIAL_TIMEOUT=1.0
 SERIAL_DSRDTR=true
-FONT=a
-DENSITY_LEVEL=4
+
+# ---------------------------------------------------------------------------
+# Printer profile / media / encoding
+# ---------------------------------------------------------------------------
+PRINTER_PROFILE=RP326
+MEDIA_WIDTH_PIXELS=384
+MEDIA_WIDTH_MM=58.0
 CODEPAGE=cp1251
 CODEPAGE_ID=6
-PRINTER_PROFILE=RP326
+
+# ---------------------------------------------------------------------------
+# Default text rendering (python-escpos set())
+# ---------------------------------------------------------------------------
+FONT=a
+DENSITY_LEVEL=4
 TEXT_UNDERLINE=0
 TEXT_ALIGN=left
 TEXT_WIDTH=2
@@ -38,6 +56,35 @@ TEXT_HEIGHT=2
 TEXT_INVERT=0
 TEXT_SMOOTH=false
 TEXT_FLIP=false
+
+# ---------------------------------------------------------------------------
+# Telegram entities → printer styles
+# ---------------------------------------------------------------------------
+PRINT_TELEGRAM_FORMATTING=true
+
+# ---------------------------------------------------------------------------
+# Per-message header printing
+# ---------------------------------------------------------------------------
+PRINT_HEADER_ENABLED=true
+HEADER_LINE_WIDTH=42
+
+# ---------------------------------------------------------------------------
+# QR printing (software-rendered, native=False)
+# ---------------------------------------------------------------------------
+QR_SIZE=3
+QR_ALIGN=center
+QR_DENSITY=3
+QR_CENTER=false
+QR_IMG_IMPL=bitImageColumn
+
+# ---------------------------------------------------------------------------
+# Image printing (photos)
+# ---------------------------------------------------------------------------
+IMAGE_IMPL=bitImageRaster
+IMAGE_FRAGMENT_HEIGHT=960
+IMAGE_CENTER=false
+IMAGE_DENSITY=5
+IMAGE_PRINT_WIDTH=384
 """
 
 
