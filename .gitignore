@@ -80,3 +80,5 @@ releases/
 plans/
 .cursor/
 project-summary.md
+.vscode/
+.continue/
