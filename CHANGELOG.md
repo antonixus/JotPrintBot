@@ -1,3 +1,57 @@
+## JotPrintBot v0.1.4 – Image printing and printer state management
+
+### Image printing feature
+
+- **Photo printing support**:
+  - Added `ImagePayload` to `print_tasks.py` to support image printing in the unified print queue.
+  - New photo handler in `bot.py` using `F.photo` filter to handle Telegram photo messages.
+  - Photos are downloaded to temporary files, queued as `PrintTask` with `ImagePayload`, and automatically cleaned up after printing.
+- **Image processing**:
+  - Implemented `_do_print_image()` in `printer.py` using PIL (Pillow) for image manipulation.
+  - Automatic orientation handling: landscape images are rotated 90° clockwise before printing.
+  - Automatic resizing to printer width (384 pixels for CSN-A2, configurable via `IMAGE_PRINT_WIDTH`) while preserving aspect ratio.
+  - Large images are automatically fragmented (configurable via `IMAGE_FRAGMENT_HEIGHT`).
+- **Image printing configuration via `.env`**:
+  - `IMAGE_IMPL` – ESC/POS image command: `bitImageRaster`, `graphics`, or `bitImageColumn` (default: `bitImageRaster`).
+  - `IMAGE_FRAGMENT_HEIGHT` – Maximum height per fragment for large images (default: `960`).
+  - `IMAGE_CENTER` – Center image horizontally (requires `MEDIA_WIDTH_PIXELS`; default: `false`).
+  - `IMAGE_DENSITY` – Print density 0–8 for images (default: `5`).
+  - `IMAGE_PRINT_WIDTH` – Target width in pixels for image resizing (default: `384` for CSN-A2).
+- **Dependencies**:
+  - Added `Pillow>=9.0.0` to `requirements.txt` for image processing.
+
+### Printer state management fixes
+
+- **Printer re-initialization after graphics mode**:
+  - Added `_reinitialize_printer()` method to reset printer state after image/QR printing.
+  - Fixes issue where text printed after images would appear garbled or blurry until printer power cycle.
+  - Sends ESC @ (Initialize) and ESC t (code page) commands to fully reset printer to text mode.
+  - Applied after both image printing and QR code printing (which uses image mode when `native=False`).
+
+### Configuration and documentation improvements
+
+- **`.env` file organization**:
+  - Reorganized `.env.example` and `setup.py` template into functional blocks with comment headers:
+    - Core bot / security
+    - Printer connection (Serial / UART)
+    - Printer profile / media / encoding
+    - Default text rendering
+    - Telegram entities → printer styles
+    - Per-message header printing
+    - QR printing
+    - Image printing
+  - Improved readability and maintainability of configuration files.
+- **Documentation updates**:
+  - Updated README.md with comprehensive image printing section.
+  - Added image printing to main functionality list.
+  - Documented all new `IMAGE_*` configuration options in `.env` table.
+
+### Development tools
+
+- **Continue.dev rules**:
+  - Added `.continue/rules/python-codegen.md` with Python coding standards for Continue.dev compatibility.
+  - Includes PEP 8 guidelines, Google-style docstrings, type hints, and pytest testing standards.
+
 ## JotPrintBot v0.1.3 – Per-message headers, text formatting and unified print queue
 
 ### Per-message header feature

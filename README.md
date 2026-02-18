@@ -21,6 +21,7 @@ The bot uses [aiogram](https://docs.aiogram.dev/) for Telegram integration and [
 - **Print text** — Send any text message (up to 1000 characters); it will be wrapped to the printer’s font width and queued for printing:
   - `FONT=a` (Font A): 32 characters per line
   - `FONT=b` (Font B): 42 characters per line
+- **Print images** — Send a photo; it is resized to printer width (384 pixels), optionally rotated if landscape, and queued for printing
 - **Whitelist access** — Only users in the whitelist can use the bot; others receive "Access denied"
 - **Rate limiting** — 1 print per 10 seconds per user by default (configurable via `PRINT_RATE_LIMIT_SECONDS`)
 - **Telegram formatting → printer styles** (when `PRINT_TELEGRAM_FORMATTING=true`):
