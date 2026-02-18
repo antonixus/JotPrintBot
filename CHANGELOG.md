@@ -41,16 +41,7 @@
     - QR printing
     - Image printing
   - Improved readability and maintainability of configuration files.
-- **Documentation updates**:
-  - Updated README.md with comprehensive image printing section.
-  - Added image printing to main functionality list.
-  - Documented all new `IMAGE_*` configuration options in `.env` table.
 
-### Development tools
-
-- **Continue.dev rules**:
-  - Added `.continue/rules/python-codegen.md` with Python coding standards for Continue.dev compatibility.
-  - Includes PEP 8 guidelines, Google-style docstrings, type hints, and pytest testing standards.
 
 ## JotPrintBot v0.1.3 – Per-message headers, text formatting and unified print queue
 
