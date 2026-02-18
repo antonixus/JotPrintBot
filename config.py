@@ -61,7 +61,7 @@ PRINTER_PROFILE: str = os.getenv("PRINTER_PROFILE", "RP326").strip()
 # Printer media width in pixels
 MEDIA_WIDTH_PIXELS: int = int(os.getenv("MEDIA_WIDTH_PIXELS").strip())
 # Printer media width in mm
-MEDIA_WIDTH_MM: float = float(os.getenv("MEDIA_WIDTH_PIXELS").strip())
+MEDIA_WIDTH_MM: float = float(os.getenv("MEDIA_WIDTH_MM").strip())
 
 # Default text style for python-escpos .set()
 TEXT_UNDERLINE: int = int(os.getenv("TEXT_UNDERLINE", "0").strip())
