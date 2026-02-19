@@ -97,6 +97,14 @@ IMAGE_CENTER: bool = _parse_bool(os.getenv("IMAGE_CENTER", "false"))
 IMAGE_DENSITY: int = int(os.getenv("IMAGE_DENSITY", "5").strip())
 IMAGE_PRINT_WIDTH: int = int(os.getenv("IMAGE_PRINT_WIDTH", "384").strip())  # CSN-A2 48mm @ 8 dots/mm
 
+# Image enhancement settings (new)
+IMAGE_ENHANCE_ENABLED: bool = _parse_bool(os.getenv("IMAGE_ENHANCE_ENABLED", "true"))
+IMAGE_CONTRAST: float = float(os.getenv("IMAGE_CONTRAST", "1.5").strip())  # Default: 1.5
+IMAGE_SHARPNESS: float = float(os.getenv("IMAGE_SHARPNESS", "2.0").strip())  # Default: 2.0
+IMAGE_BRIGHTNESS: float = float(os.getenv("IMAGE_BRIGHTNESS", "1.0").strip())  # Default: 1.0
+IMAGE_GRAYSCALE: bool = _parse_bool(os.getenv("IMAGE_GRAYSCALE", "true"))  # Default: true
+IMAGE_DITHERING: bool = _parse_bool(os.getenv("IMAGE_DITHERING", "true"))  # Default: true
+
 # Serial line settings for python-escpos Serial printer (optional)
 SERIAL_BYTESIZE: int = int(os.getenv("SERIAL_BYTESIZE", "8").strip())
 SERIAL_PARITY: str = os.getenv("SERIAL_PARITY", "N").strip().upper()

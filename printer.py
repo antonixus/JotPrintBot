@@ -51,6 +51,10 @@ class MockPrinter:
 
     def image(self, img_source: Any, **kwargs: Any) -> None:
         """No-op stub for image printing."""
+        # Log enhancement info for testing
+        from PIL import Image
+        if isinstance(img_source, Image.Image):
+            logger.debug("Mock image print: mode=%s, size=%s", img_source.mode, img_source.size)
 
 
 class AsyncPrinter:
@@ -414,6 +418,10 @@ class AsyncPrinter:
                 img = img.rotate(-90, expand=True)
                 w, h = img.size
 
+            # Apply image enhancements for thermal printer
+            if config.IMAGE_ENHANCE_ENABLED:
+                img = self._enhance_image(img)
+
             # Resize to printer width (384 dots for CSN-A2) while preserving aspect ratio
             target_width = getattr(config, "IMAGE_PRINT_WIDTH", 384)
             if w != target_width:
@@ -442,6 +450,42 @@ class AsyncPrinter:
                 Path(image_path).unlink(missing_ok=True)
             except Exception as e:
                 logger.warning("Failed to delete temp image file %s: %s", image_path, e)
+
+    def _enhance_image(self, img: Any) -> Any:
+        """Apply image enhancements for thermal printer compatibility.
+
+        Args:
+            img: PIL Image object (RGB mode)
+
+        Returns:
+            Enhanced PIL Image ready for ESC/POS printing
+        """
+        from PIL import ImageEnhance, ImageFilter, Image
+
+        # Step 1: Convert to grayscale for thermal printer compatibility
+        if config.IMAGE_GRAYSCALE:
+            img = img.convert("L")
+
+        # Step 2: Apply contrast enhancement
+        if config.IMAGE_CONTRAST != 1.0:
+            enhancer = ImageEnhance.Contrast(img)
+            img = enhancer.enhance(config.IMAGE_CONTRAST)
+
+        # Step 3: Apply sharpness enhancement
+        if config.IMAGE_SHARPNESS != 1.0:
+            enhancer = ImageEnhance.Sharpness(img)
+            img = enhancer.enhance(config.IMAGE_SHARPNESS)
+
+        # Step 4: Apply brightness adjustment
+        if config.IMAGE_BRIGHTNESS != 1.0:
+            enhancer = ImageEnhance.Brightness(img)
+            img = enhancer.enhance(config.IMAGE_BRIGHTNESS)
+
+        # Step 5: Apply dithering for smooth gradients (Floyd-Steinberg)
+        if config.IMAGE_DITHERING:
+            img = img.convert("1", dither=Image.FLOYDSTEINBERG)
+
+        return img
 
     def _cut(self) -> None:
         """Cut paper with python-escpos version compatibility."""

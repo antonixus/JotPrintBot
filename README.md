@@ -21,7 +21,7 @@ The bot uses [aiogram](https://docs.aiogram.dev/) for Telegram integration and [
 - **Print text** — Send any text message (up to 1000 characters); it will be wrapped to the printer’s font width and queued for printing:
   - `FONT=a` (Font A): 32 characters per line
   - `FONT=b` (Font B): 42 characters per line
-- **Print images** — Send a photo; it is resized to printer width (384 pixels), optionally rotated if landscape, and queued for printing
+- **Print images** — Send a photo; it is resized to printer width (384 pixels), optionally rotated if landscape, and queued for printing. **Image enhancement** (contrast, sharpness, brightness, grayscale, dithering) improves thermal printer output quality
 - **Whitelist access** — Only users in the whitelist can use the bot; others receive "Access denied"
 - **Rate limiting** — 1 print per 10 seconds per user by default (configurable via `PRINT_RATE_LIMIT_SECONDS`)
 - **Telegram formatting → printer styles** (when `PRINT_TELEGRAM_FORMATTING=true`):
@@ -132,6 +132,12 @@ Edit `.env` in the project root:
 | `IMAGE_CENTER` | No       | Center image horizontally (requires `MEDIA_WIDTH_PIXELS` to be set; default: `false`) |
 | `IMAGE_DENSITY` | No      | Print density for images (0–8, default: `5`) |
 | `IMAGE_PRINT_WIDTH` | No | Target width in pixels for image resizing (default: `384` for CSN-A2) |
+| `IMAGE_ENHANCE_ENABLED` | No | Enable/disable image enhancement (default: `true`) |
+| `IMAGE_CONTRAST` | No | Contrast enhancement factor (default: `1.5`) |
+| `IMAGE_SHARPNESS` | No | Sharpness enhancement factor (default: `2.0`) |
+| `IMAGE_BRIGHTNESS` | No | Brightness adjustment factor (default: `1.0`) |
+| `IMAGE_GRAYSCALE` | No | Convert to grayscale before printing (default: `true`) |
+| `IMAGE_DITHERING` | No | Apply Floyd-Steinberg dithering for smooth gradients (default: `true`) |
 
 **Raspberry Pi / DietPi:** Enable serial in `raspi-config` → Interface Options → Serial Port.
 
@@ -192,6 +198,7 @@ Send a photo to the bot to print it. The image will be:
 - **Orientation handling:** Landscape images are rotated 90° clockwise before printing
 - **Aspect ratio preserved:** Images are scaled proportionally to fit the printer width
 - **Fragmentation:** Large images are automatically split into fragments (configurable via `IMAGE_FRAGMENT_HEIGHT`)
+- **Image enhancement:** Improves print quality with contrast, sharpness, brightness, grayscale conversion, and dithering (configurable via `IMAGE_ENHANCE_ENABLED`, `IMAGE_CONTRAST`, `IMAGE_SHARPNESS`, `IMAGE_BRIGHTNESS`, `IMAGE_GRAYSCALE`, `IMAGE_DITHERING`)
 
 **Supported formats:** JPEG, PNG (as sent by Telegram)
 
@@ -201,8 +208,36 @@ Send a photo to the bot to print it. The image will be:
 - `IMAGE_CENTER`: Center image horizontally (requires `MEDIA_WIDTH_PIXELS`; default: `false`)
 - `IMAGE_DENSITY`: Print density 0–8 (default: `5`)
 - `IMAGE_PRINT_WIDTH`: Target width in pixels (default: `384` for CSN-A2)
+- `IMAGE_ENHANCE_ENABLED`: Enable/disable image enhancement (default: `true`)
+- `IMAGE_CONTRAST`: Contrast enhancement factor (default: `1.5`)
+- `IMAGE_SHARPNESS`: Sharpness enhancement factor (default: `2.0`)
+- `IMAGE_BRIGHTNESS`: Brightness adjustment factor (default: `1.0`)
+- `IMAGE_GRAYSCALE`: Convert to grayscale before printing (default: `true`)
+- `IMAGE_DITHERING`: Apply Floyd-Steinberg dithering for smooth gradients (default: `true`)
 
 **Note:** Pillow is required for image processing and is listed in `requirements.txt`. On Raspberry Pi, ensure system libraries for Pillow are installed (see Installation section).
+
+### Image Enhancement
+
+The bot applies image preprocessing techniques to improve thermal printer output quality:
+
+- **Grayscale conversion** — Thermal printers work best with B&W images
+- **Contrast enhancement** — Improves black/white distinction
+- **Sharpness enhancement** — Makes edges more defined
+- **Brightness adjustment** — Optimizes for thermal paper
+- **Floyd-Steinberg dithering** — Smooth gradients for thermal printing
+
+**Configuration** (in `.env`):
+```bash
+IMAGE_ENHANCE_ENABLED=true
+IMAGE_CONTRAST=1.5
+IMAGE_SHARPNESS=2.0
+IMAGE_BRIGHTNESS=1.0
+IMAGE_GRAYSCALE=true
+IMAGE_DITHERING=true
+```
+
+For fine-tuning parameters for your specific printer, see [`DEPLOYMENT_GUIDE.md`](DEPLOYMENT_GUIDE.md:1).
 
 ---
 
@@ -215,6 +250,14 @@ The project uses [pytest](https://docs.pytest.org/) with [pytest-asyncio](https:
 ```bash
 pytest test/ -v
 ```
+
+### Image enhancement tests
+
+```bash
+pytest test/image_enhancement.py -v   # Unit tests for image enhancement
+pytest test/test_printer.py -v        # Integration tests for image printing
+```
+
 
 ### Run specific test files
 
