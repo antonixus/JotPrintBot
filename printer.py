@@ -403,31 +403,40 @@ class AsyncPrinter:
         """Blocking image print (runs in executor).
 
         Opens image with PIL, handles orientation (rotate landscape 90° CW),
-        resizes to printer width (384 dots for CSN-A2), sets density, and prints.
-        Deletes temp file after printing (or on error).
+        resizes to printer width (384 dots for CSN-A2), optionally applies
+        image enhancements, sets density, and prints. Deletes the temp file
+        after printing (or on error).
         """
         from PIL import Image
 
         try:
             # Open and convert to RGB (CSN-A2 is B&W but PIL handles conversion)
             img = Image.open(image_path).convert("RGB")
-            w, h = img.size
 
             # Rotate landscape images 90° clockwise (PIL rotate is CCW, so -90 = CW)
-            if w > h:
+            if img.width > img.height:
                 img = img.rotate(-90, expand=True)
-                w, h = img.size
 
-            # Apply image enhancements for thermal printer
-            if config.IMAGE_ENHANCE_ENABLED:
-                img = self._enhance_image(img)
-
-            # Resize to printer width (384 dots for CSN-A2) while preserving aspect ratio
+            # Resize to printer width while preserving aspect ratio.
+            # Do this before enhancement so dithering works on final-resolution pixels.
             target_width = getattr(config, "IMAGE_PRINT_WIDTH", 384)
-            if w != target_width:
-                ratio = target_width / w
-                new_height = int(h * ratio)
+            if img.width != target_width:
+                ratio = target_width / img.width
+                new_height = int(img.height * ratio)
                 img = img.resize((target_width, new_height), Image.Resampling.LANCZOS)
+
+            # Apply image enhancements for thermal printer output, if enabled.
+            if config.IMAGE_ENHANCE_ENABLED:
+                logger.debug(
+                    "Applying image enhancement for thermal printer output "
+                    "(contrast=%s, sharpness=%s, brightness=%s, grayscale=%s, dithering=%s)",
+                    config.IMAGE_CONTRAST,
+                    config.IMAGE_SHARPNESS,
+                    config.IMAGE_BRIGHTNESS,
+                    config.IMAGE_GRAYSCALE,
+                    config.IMAGE_DITHERING,
+                )
+                img = self._enhance_image(img)
 
             # Set print density before printing
             self.printer.set(density=config.IMAGE_DENSITY)
@@ -441,7 +450,7 @@ class AsyncPrinter:
                 high_density_vertical=True,
                 high_density_horizontal=True,
             )
-            
+
             # Full re-initialize after image: ESC @ clears graphics mode so next text prints correctly
             self._reinitialize_printer()
         finally:
