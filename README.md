@@ -145,6 +145,24 @@ The printer connection uses UART serial. Many ESC/POS printers work with 9600 ba
 
 ---
 
+## Assembly
+
+To build a portable JotPrintBot with a CSN-A2 printer and Raspberry Pi Zero W (including PD power and step-down to 5 V), follow the step-by-step guide:
+
+**[Assembly instructions](assembly/ASSEMBLY_INSTRUCTIONS.md)** — BOM, wiring schematic, and wiring steps.
+
+You can **3D print a printer case** to house the thermal printer, Raspberry Pi, and wiring. STEP and Bambu Lab Studio (3mf) model files are in [`assembly/3D_printing/`](assembly/3D_printing/); the same assembly instructions document includes recommended print settings (PLA, layer height, supports, etc.).
+
+### Assembled device
+
+*Photo of the assembled device (printer + Pi + optional 3D-printed case) can be added here.*
+
+<!--
+![Assembled JotPrintBot](docs/assembled_device.jpg)
+-->
+
+---
+
 ## Usage
 
 ### Launch the application
