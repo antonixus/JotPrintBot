@@ -153,13 +153,7 @@ To build a portable JotPrintBot with a CSN-A2 printer and Raspberry Pi Zero W (i
 
 You can **3D print a printer case** to house the thermal printer, Raspberry Pi, and wiring. STEP and Bambu Lab Studio (3mf) model files are in [`assembly/3D_printing/`](assembly/3D_printing/); the same assembly instructions document includes recommended print settings (PLA, layer height, supports, etc.).
 
-### Assembled device
-
-*Photo of the assembled device (printer + Pi + optional 3D-printed case) can be added here.*
-
-<!--
-![Assembled JotPrintBot](docs/assembled_device.jpg)
--->
+![JotPrintBot 3d model render](assembly/assets/render-collage.png)
 
 ---
 
