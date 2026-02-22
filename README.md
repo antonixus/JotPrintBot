@@ -293,7 +293,8 @@ pytest test/test_encoding.py -v  # Cyrillic encoding on real printer (requires h
 
 Tests cover:
 
-- **Printer (mock):** Initialization, `print_text`, `print_qr`, `status` in mock mode
+- **Printer (mock):** Initialization, `print_text`, `print_qr`, `print_task`, `status`, and image printing (`_do_print_image`) in mock mode
+- **Image enhancement:** Unit tests in `test/image_enhancement.py` for `_enhance_image()` (contrast, sharpness, brightness, grayscale, dithering, and disabled path)
 - **Wrapping helper scripts:** How many characters fit per line for different fonts
 - **Encoding helper script:** Cyrillic output validation using the configured printer profile and code page
 

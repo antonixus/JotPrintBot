@@ -1,3 +1,32 @@
+## JotPrintBot v0.1.5 – Image enhancement and assembly documentation
+
+### Image enhancement for thermal printing
+
+- **Image preprocessing pipeline**:
+  - Added `_enhance_image()` in `printer.py` to improve thermal printer output quality.
+  - Pipeline: grayscale conversion (optional), contrast, sharpness, brightness (PIL `ImageEnhance`), then Floyd-Steinberg dithering (`Image.convert("1", dither=Image.FLOYDSTEINBERG)`).
+  - Enhancement runs after resize and before sending to the printer so dithering uses final-resolution pixels.
+- **Configuration via `.env`**:
+  - `IMAGE_ENHANCE_ENABLED` – enable/disable enhancement (default: `true`).
+  - `IMAGE_CONTRAST` – contrast factor (default: `1.5`).
+  - `IMAGE_SHARPNESS` – sharpness factor (default: `2.0`).
+  - `IMAGE_BRIGHTNESS` – brightness factor (default: `1.0`).
+  - `IMAGE_GRAYSCALE` – convert to grayscale before printing (default: `true`).
+  - `IMAGE_DITHERING` – apply Floyd-Steinberg dithering (default: `true`).
+- **Documentation**: README Image Enhancement subsection, configuration table, and `DEPLOYMENT_GUIDE.md` reference for fine-tuning.
+
+### Assembly and hardware documentation
+
+- **README**: New **Assembly** section with link to step-by-step assembly instructions, note on 3D-printing a printer case (models in `assembly/3D_printing/`), and placeholder for a photo of the assembled device.
+- **Assembly instructions** (`assembly/ASSEMBLY_INSTRUCTIONS.md`): Improved structure, safety note, BOM fixes (typos, duplicate line), clearer wiring steps and image paths, 3D print parameters table, and “Assembled device” photo placeholder.
+
+### Tests
+
+- **Image enhancement**: New `test/image_enhancement.py` with unit tests for `_enhance_image()` (contrast, sharpness, brightness, grayscale, dithering, and disabled-enhancement path).
+- **Printer image tests**: `test/test_printer.py` – `TestAsyncPrinterPrintImage` tests for image printing with enhancement in mock mode (using temporary image files).
+
+---
+
 ## JotPrintBot v0.1.4 – Image printing and printer state management
 
 ### Image printing feature

@@ -1,5 +1,8 @@
 """Pytest tests for printer module with MOCK_PRINTER=True."""
 
+import tempfile
+from pathlib import Path
+
 import pytest
 from unittest.mock import patch
 
@@ -135,16 +138,16 @@ class TestAsyncPrinterPrintImage:
 
         caplog.set_level(logging.DEBUG)
         p = AsyncPrinter()
-
-        # Create a test image
         img = Image.new("RGB", (100, 100), color=(128, 128, 128))
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
+            path = f.name
+        try:
+            img.save(path)
+            p._do_print_image(path)
+        finally:
+            Path(path).unlink(missing_ok=True)
 
-        # Print the image
-        p._do_print_image("test_image.jpg")
-
-        # Verify enhancement was applied (image mode should be L or 1)
         assert p._mock
-        # Check logs for enhancement info
         assert any("enhance" in log.lower() for log in caplog.text)
 
     async def test_print_image_completes_without_error(self, mock_config):
@@ -153,7 +156,13 @@ class TestAsyncPrinterPrintImage:
 
         p = AsyncPrinter()
         img = Image.new("RGB", (100, 100), color=(128, 128, 128))
-        p._do_print_image("test_image.jpg")
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
+            path = f.name
+        try:
+            img.save(path)
+            p._do_print_image(path)
+        finally:
+            Path(path).unlink(missing_ok=True)
 
     async def test_print_image_handles_landscape(self, mock_config, caplog):
         """Test landscape image rotation and enhancement."""
@@ -161,11 +170,14 @@ class TestAsyncPrinterPrintImage:
         from PIL import Image
         caplog.set_level(logging.DEBUG)
         p = AsyncPrinter()
-
-        # Create a landscape image (200x100)
         img = Image.new("RGB", (200, 100), color=(128, 128, 128))
-        p._do_print_image("landscape_image.jpg")
-
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
+            path = f.name
+        try:
+            img.save(path)
+            p._do_print_image(path)
+        finally:
+            Path(path).unlink(missing_ok=True)
         assert p._mock
         assert any("enhance" in log.lower() for log in caplog.text)
 
@@ -175,10 +187,13 @@ class TestAsyncPrinterPrintImage:
         from PIL import Image
         caplog.set_level(logging.DEBUG)
         p = AsyncPrinter()
-
-        # Create a portrait image (100x200)
         img = Image.new("RGB", (100, 200), color=(128, 128, 128))
-        p._do_print_image("portrait_image.jpg")
-
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
+            path = f.name
+        try:
+            img.save(path)
+            p._do_print_image(path)
+        finally:
+            Path(path).unlink(missing_ok=True)
         assert p._mock
         assert any("enhance" in log.lower() for log in caplog.text)
