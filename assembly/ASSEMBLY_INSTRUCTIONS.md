@@ -17,13 +17,13 @@ This guide describes how to build a portable JotPrintBot setup using a CSN-A2 th
 | 2 | Raspberry Pi Zero W                       | ![RPi Zero W](assets/rpi_zero_w.png)               | [PDF](https://cdn.sparkfun.com/assets/learn_tutorials/6/7/6/PiZero_1.pdf) / [Shop Ali](https://ali.click/dmq801y)                  |
 | 3 | KIS-3R33S DC-DC step-down module          | ![KIS-3R33S](assets/kis-3r33s_DC-DC_step-down.png) | [Datasheet](https://www.datasheetcafe.com/wp-content/uploads/2016/05/KIS-3R33S.pdf) / [Shop Ali](https://ali.click/ker801a)        |
 | 4 | USB Type-C QC/PD/AFC Trigger board        | ![Type-C PD trigger](assets/type-c_PD_trigger.png) | 5/9/12/15/20V / [Manual](https://manuals.plus/asin/B0CDWXN1WR) / [Shop Ali](https://ali.click/p1t8018)                              |
-| 5 | 2.4 GHz Wi-Fi антенна 2 dBi RP-SMA | ![RP-SMA antenna](assets/RP-SMA_wifi_antenna.png)  | [Shop Ali](https://ali.click/ort801m)                                                                                              |
+| 5 | 2.4 GHz Wi-Fi antenna 2 dBi RP-SMA | ![RP-SMA antenna](assets/RP-SMA_wifi_antenna.png)  | [Shop Ali](https://ali.click/ort801m)                                                                                              |
 
 ### Fasteners
 
 - M3 × 4 mm bolts (round head or flat head) — 13 pcs
 - M2.5 × 5 mm bolts — 2 pcs
-- M3 threaded inserts (e.g. 4 mm length) — 4 pcs
+- M3 threaded inserts (e.g. 4 mm length) — 8 pcs
 
 ### Wires
 
