@@ -11,12 +11,12 @@ This guide describes how to build a portable JotPrintBot setup using a CSN-A2 th
 ### Electronics
 
 
-| # | Component                        | Photo                                           | Info / Links                                                                                                |
-| --- | ------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| 1 | CSN-A2 Micro panel printer                | ![CSN-A2](assets/CSN-A2_micro_panel_printer.png)   | ESC/POS, 9V/12V / [Manual](https://cdn-shop.adafruit.com/datasheets/CSN-A2+User+Manual.pdf) / [Shop Ali](https://ali.click/gpp8018) |
-| 2 | Raspberry Pi Zero W                       | ![RPi Zero W](assets/rpi_zero_w.png)               | [PDF](https://cdn.sparkfun.com/assets/learn_tutorials/6/7/6/PiZero_1.pdf) / [Shop Ali](https://ali.click/dmq801y)                  |
-| 3 | KIS-3R33S DC-DC step-down module          | ![KIS-3R33S](assets/kis-3r33s_DC-DC_step-down.png) | [Datasheet](https://www.datasheetcafe.com/wp-content/uploads/2016/05/KIS-3R33S.pdf) / [Shop Ali](https://ali.click/ker801a)        |
-| 4 | USB Type-C QC/PD/AFC Trigger board        | ![Type-C PD trigger](assets/type-c_PD_trigger.png) | 5/9/12/15/20V / [Manual](https://manuals.plus/asin/B0CDWXN1WR) / [Shop Ali](https://ali.click/p1t8018)                              |
+| # | Component                          | Photo                                              | Info / Links                                                                                                                       |
+| --- | ------------------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 1 | CSN-A2 Micro panel printer         | ![CSN-A2](assets/CSN-A2_micro_panel_printer.png)   | ESC/POS, 9V/12V /[Manual](https://cdn-shop.adafruit.com/datasheets/CSN-A2+User+Manual.pdf) / [Shop Ali](https://ali.click/gpp8018) |
+| 2 | Raspberry Pi Zero W                | ![RPi Zero W](assets/rpi_zero_w.png)               | [PDF](https://cdn.sparkfun.com/assets/learn_tutorials/6/7/6/PiZero_1.pdf) / [Shop Ali](https://ali.click/dmq801y)                  |
+| 3 | KIS-3R33S DC-DC step-down module   | ![KIS-3R33S](assets/kis-3r33s_DC-DC_step-down.png) | [Datasheet](https://www.datasheetcafe.com/wp-content/uploads/2016/05/KIS-3R33S.pdf) / [Shop Ali](https://ali.click/ker801a)        |
+| 4 | USB Type-C QC/PD/AFC Trigger board | ![Type-C PD trigger](assets/type-c_PD_trigger.png) | 5/9/12/15/20V / [Manual](https://manuals.plus/asin/B0CDWXN1WR) / [Shop Ali](https://ali.click/p1t8018)                             |
 | 5 | 2.4 GHz Wi-Fi antenna 2 dBi RP-SMA | ![RP-SMA antenna](assets/RP-SMA_wifi_antenna.png)  | [Shop Ali](https://ali.click/ort801m)                                                                                              |
 
 ### Fasteners
@@ -79,6 +79,8 @@ After wiring, enable the serial port on the Pi: `raspi-config` → Interface Opt
 
 ## Case: 3D printing
 
+[Makerworld Bambulab Studio project](https://makerworld.com/ru/models/2431859-jotprintbot-portable-telegram-thermal-printer#profileId-2667653)
+
 A 3D-printed case allows you to house the printer, Raspberry Pi, and wiring in one unit. Model files are in the `assembly/3D_printing/` folder.
 
 ![Case render](assets/render_1.png)
@@ -111,8 +113,4 @@ Location: **`assembly/3D_printing/`**
 
 ## Assembled device
 
-*Space for a photo of your assembled JotPrintBot (printer + Pi + case).*
-
-<!-- Add an image here, e.g.:
-![Assembled JotPrintBot](assets/assembled_photo.jpg)
--->
+![Assembled device](assets/photos/photo-collage.png)
