@@ -3,11 +3,17 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/antonixus/JotPrintBot/blob/main/LICENSE)
 
+
+<p align="center">
+  <img src="assembly/assets/logo.jpg" alt="JotPrintBot Logo" />
+</p>
+
 ## Introduction
 
 **JotPrintBot** is an asynchronous Python application that allows you to print text from Telegram messages to a thermal receipt printer. Send a message to the bot, and it will be printed on paper via a connected ESC/POS thermal printer.
 
 **Supported hardware:**
+
 - **CSN-A2 TTL** thermal printer (and other ESC/POS compatible models)
 - **Raspberry Pi** / **DietPi** (serial connection via `/dev/serial0` or similar)
 - Any Linux system with a serial or USB-Serial thermal printer
@@ -92,52 +98,53 @@ python setup.py --install-service
 
 Edit `.env` in the project root:
 
-| Variable       | Required | Description                                      |
-|----------------|----------|--------------------------------------------------|
-| `BOT_TOKEN`    | Yes      | Telegram bot token from [@BotFather](https://t.me/BotFather) |
-| `ADMIN_ID`     | Yes      | Your Telegram user ID (for error notifications)  |
-| `WHITELIST`    | Yes      | Comma-separated Telegram user IDs allowed to use the bot |
-| `SERIAL_PORT`  | No       | Serial device (default: `/dev/serial0`)          |
-| `BAUDRATE`     | No       | Baud rate (default: `9600`)                      |
-| `MOCK_PRINTER` | No       | `true` to run without hardware (default: `false`) |
-| `FONT`         | No       | Printer font code for python-escpos (default: `a`) |
-| `DENSITY_LEVEL`| No       | Print density 0–8 (default: `4`)                 |
-| `PRINT_RATE_LIMIT_SECONDS` | No | Seconds between prints per user (default: `10`) |
-| `PRINT_HEADER_ENABLED` | No | Print a header before every print (default: `true`) |
-| `HEADER_LINE_WIDTH` | No | Header rule width in characters (default: `42`) |
-| `CODEPAGE`     | No       | Python codec name for text encoding before sending to printer (default: `cp1251`) |
-| `CODEPAGE_ID`  | No       | ESC/POS code page ID used with `ESC t` (on many printers `6` is cp1251; default: `6`) |
-| `PRINTER_PROFILE` | No    | python-escpos printer profile name (default: `RP326`) |
-| `MEDIA_WIDTH_PIXELS` | No    | Printer media width in pixels |
-| `MEDIA_WIDTH_MM` | No    | Printer media width in mm |
-| `TEXT_UNDERLINE`| No      | Default underline mode (0/1) for printer text (default: `0`) |
-| `TEXT_ALIGN`   | No       | Default alignment for printer text: `left`, `center`, or `right` (default: `left`) |
-| `TEXT_WIDTH`   | No       | Default width multiplier for printer text (default: `1`) |
-| `TEXT_HEIGHT`  | No       | Default height multiplier for printer text (default: `1`) |
-| `TEXT_INVERT`  | No       | Default invert mode (0/1) for printer text (default: `0`) |
-| `TEXT_SMOOTH`  | No       | Default smoothing for printer text (default: `false`) |
-| `TEXT_FLIP`    | No       | Default flip mode for printer text (default: `false`) |
-| `SERIAL_BYTESIZE` | No | Serial byte size (default: `8`) |
-| `SERIAL_PARITY` | No | Serial parity (default: `N`) |
-| `SERIAL_STOPBITS` | No | Serial stop bits (default: `1`) |
-| `SERIAL_TIMEOUT` | No | Serial timeout in seconds (default: `1.0`) |
-| `SERIAL_DSRDTR` | No | Enable DSR/DTR flow control (default: `true`) |
-| `QR_SIZE`      | No       | Default QR code pixel size 1–16 (default: `3`) |
-| `QR_ALIGN`     | No       | Base alignment before printing QR codes: `left`, `center`, or `right` (default: `center`) |
-| `QR_DENSITY`   | No       | Print density used for QR codes (default: `3`) |
-| `QR_CENTER`    | No       | Center QR image when using software-rendered QR (default: `false`, example: `true`) |
-| `QR_IMG_IMPL`  | No       | Image implementation for QR rendering: `bitImageRaster`, `graphics`, or `bitImageColumn` (default: `bitImageRaster`, example: `bitImageColumn`) |
-| `IMAGE_IMPL`   | No       | ESC/POS image command for image printing: `bitImageRaster`, `graphics`, or `bitImageColumn` (default: `bitImageRaster`) |
-| `IMAGE_FRAGMENT_HEIGHT` | No | Max height per fragment for large images (default: `960`) |
-| `IMAGE_CENTER` | No       | Center image horizontally (requires `MEDIA_WIDTH_PIXELS` to be set; default: `false`) |
-| `IMAGE_DENSITY` | No      | Print density for images (0–8, default: `5`) |
-| `IMAGE_PRINT_WIDTH` | No | Target width in pixels for image resizing (default: `384` for CSN-A2) |
-| `IMAGE_ENHANCE_ENABLED` | No | Enable/disable image enhancement (default: `true`) |
-| `IMAGE_CONTRAST` | No | Contrast enhancement factor (default: `1.5`) |
-| `IMAGE_SHARPNESS` | No | Sharpness enhancement factor (default: `2.0`) |
-| `IMAGE_BRIGHTNESS` | No | Brightness adjustment factor (default: `1.0`) |
-| `IMAGE_GRAYSCALE` | No | Convert to grayscale before printing (default: `true`) |
-| `IMAGE_DITHERING` | No | Apply Floyd-Steinberg dithering for smooth gradients (default: `true`) |
+
+| Variable                   | Required | Description                                                                                                                                    |
+| ---------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `BOT_TOKEN`                | Yes      | Telegram bot token from[@BotFather](https://t.me/BotFather)                                                                                    |
+| `ADMIN_ID`                 | Yes      | Your Telegram user ID (for error notifications)                                                                                                |
+| `WHITELIST`                | Yes      | Comma-separated Telegram user IDs allowed to use the bot                                                                                       |
+| `SERIAL_PORT`              | No       | Serial device (default:`/dev/serial0`)                                                                                                         |
+| `BAUDRATE`                 | No       | Baud rate (default:`9600`)                                                                                                                     |
+| `MOCK_PRINTER`             | No       | `true` to run without hardware (default: `false`)                                                                                              |
+| `FONT`                     | No       | Printer font code for python-escpos (default:`a`)                                                                                              |
+| `DENSITY_LEVEL`            | No       | Print density 0–8 (default:`4`)                                                                                                               |
+| `PRINT_RATE_LIMIT_SECONDS` | No       | Seconds between prints per user (default:`10`)                                                                                                 |
+| `PRINT_HEADER_ENABLED`     | No       | Print a header before every print (default:`true`)                                                                                             |
+| `HEADER_LINE_WIDTH`        | No       | Header rule width in characters (default:`42`)                                                                                                 |
+| `CODEPAGE`                 | No       | Python codec name for text encoding before sending to printer (default:`cp1251`)                                                               |
+| `CODEPAGE_ID`              | No       | ESC/POS code page ID used with`ESC t` (on many printers `6` is cp1251; default: `6`)                                                           |
+| `PRINTER_PROFILE`          | No       | python-escpos printer profile name (default:`RP326`)                                                                                           |
+| `MEDIA_WIDTH_PIXELS`       | No       | Printer media width in pixels                                                                                                                  |
+| `MEDIA_WIDTH_MM`           | No       | Printer media width in mm                                                                                                                      |
+| `TEXT_UNDERLINE`           | No       | Default underline mode (0/1) for printer text (default:`0`)                                                                                    |
+| `TEXT_ALIGN`               | No       | Default alignment for printer text:`left`, `center`, or `right` (default: `left`)                                                              |
+| `TEXT_WIDTH`               | No       | Default width multiplier for printer text (default:`1`)                                                                                        |
+| `TEXT_HEIGHT`              | No       | Default height multiplier for printer text (default:`1`)                                                                                       |
+| `TEXT_INVERT`              | No       | Default invert mode (0/1) for printer text (default:`0`)                                                                                       |
+| `TEXT_SMOOTH`              | No       | Default smoothing for printer text (default:`false`)                                                                                           |
+| `TEXT_FLIP`                | No       | Default flip mode for printer text (default:`false`)                                                                                           |
+| `SERIAL_BYTESIZE`          | No       | Serial byte size (default:`8`)                                                                                                                 |
+| `SERIAL_PARITY`            | No       | Serial parity (default:`N`)                                                                                                                    |
+| `SERIAL_STOPBITS`          | No       | Serial stop bits (default:`1`)                                                                                                                 |
+| `SERIAL_TIMEOUT`           | No       | Serial timeout in seconds (default:`1.0`)                                                                                                      |
+| `SERIAL_DSRDTR`            | No       | Enable DSR/DTR flow control (default:`true`)                                                                                                   |
+| `QR_SIZE`                  | No       | Default QR code pixel size 1–16 (default:`3`)                                                                                                 |
+| `QR_ALIGN`                 | No       | Base alignment before printing QR codes:`left`, `center`, or `right` (default: `center`)                                                       |
+| `QR_DENSITY`               | No       | Print density used for QR codes (default:`3`)                                                                                                  |
+| `QR_CENTER`                | No       | Center QR image when using software-rendered QR (default:`false`, example: `true`)                                                             |
+| `QR_IMG_IMPL`              | No       | Image implementation for QR rendering:`bitImageRaster`, `graphics`, or `bitImageColumn` (default: `bitImageRaster`, example: `bitImageColumn`) |
+| `IMAGE_IMPL`               | No       | ESC/POS image command for image printing:`bitImageRaster`, `graphics`, or `bitImageColumn` (default: `bitImageRaster`)                         |
+| `IMAGE_FRAGMENT_HEIGHT`    | No       | Max height per fragment for large images (default:`960`)                                                                                       |
+| `IMAGE_CENTER`             | No       | Center image horizontally (requires`MEDIA_WIDTH_PIXELS` to be set; default: `false`)                                                           |
+| `IMAGE_DENSITY`            | No       | Print density for images (0–8, default:`5`)                                                                                                   |
+| `IMAGE_PRINT_WIDTH`        | No       | Target width in pixels for image resizing (default:`384` for CSN-A2)                                                                           |
+| `IMAGE_ENHANCE_ENABLED`    | No       | Enable/disable image enhancement (default:`true`)                                                                                              |
+| `IMAGE_CONTRAST`           | No       | Contrast enhancement factor (default:`1.5`)                                                                                                    |
+| `IMAGE_SHARPNESS`          | No       | Sharpness enhancement factor (default:`2.0`)                                                                                                   |
+| `IMAGE_BRIGHTNESS`         | No       | Brightness adjustment factor (default:`1.0`)                                                                                                   |
+| `IMAGE_GRAYSCALE`          | No       | Convert to grayscale before printing (default:`true`)                                                                                          |
+| `IMAGE_DITHERING`          | No       | Apply Floyd-Steinberg dithering for smooth gradients (default:`true`)                                                                          |
 
 **Raspberry Pi / DietPi:** Enable serial in `raspi-config` → Interface Options → Serial Port.
 
@@ -155,6 +162,7 @@ You can **3D print a printer case** to house the thermal printer, Raspberry Pi, 
 
 ![JotPrintBot 3d model render](assembly/assets/render-collage.png)
 
+![JotPrintBot real device photo collage](assembly/assets/photos/photo-collage.png)
 ---
 
 ## Usage
@@ -190,12 +198,13 @@ View status: `sudo systemctl status bot`. View logs: `journalctl -u bot -f`.
 
 ### Commands
 
-| Command   | Description                                    |
-|-----------|------------------------------------------------|
-| `/start`  | Welcome message and basic instructions         |
+
+| Command   | Description                                     |
+| ----------- | ------------------------------------------------- |
+| `/start`  | Welcome message and basic instructions          |
 | `/status` | Check if the printer is online and paper status |
-| `/help`   | List all commands and limits                  |
-| `/qr`     | Print a QR code with the given text           |
+| `/help`   | List all commands and limits                    |
+| `/qr`     | Print a QR code with the given text             |
 
 ### Limits
 
@@ -215,6 +224,7 @@ Send a photo to the bot to print it. The image will be:
 **Supported formats:** JPEG, PNG (as sent by Telegram)
 
 **Configuration options** (in `.env`):
+
 - `IMAGE_IMPL`: Image printing command (`bitImageRaster`, `graphics`, or `bitImageColumn`)
 - `IMAGE_FRAGMENT_HEIGHT`: Maximum height per fragment (default: `960`)
 - `IMAGE_CENTER`: Center image horizontally (requires `MEDIA_WIDTH_PIXELS`; default: `false`)
@@ -240,6 +250,7 @@ The bot applies image preprocessing techniques to improve thermal printer output
 - **Floyd-Steinberg dithering** — Smooth gradients for thermal printing
 
 **Configuration** (in `.env`):
+
 ```bash
 IMAGE_ENHANCE_ENABLED=true
 IMAGE_CONTRAST=1.5
@@ -270,7 +281,6 @@ pytest test/image_enhancement.py -v   # Unit tests for image enhancement
 pytest test/test_printer.py -v        # Integration tests for image printing
 ```
 
-
 ### Run specific test files
 
 ```bash
@@ -282,6 +292,7 @@ pytest test/test_encoding.py -v  # Cyrillic encoding on real printer (requires h
 ### Test coverage
 
 Tests cover:
+
 - **Printer (mock):** Initialization, `print_text`, `print_qr`, `status` in mock mode
 - **Wrapping helper scripts:** How many characters fit per line for different fonts
 - **Encoding helper script:** Cyrillic output validation using the configured printer profile and code page
@@ -304,6 +315,7 @@ Logging is configured with a **rotating file handler**:
 - **Level:** INFO
 
 **Logged events include:**
+
 - `Message received` — When text is queued for printing
 - `Printed` / `Printed (mock)` — When a print job completes
 - Errors with full tracebacks (print failures, handler exceptions, status check failures)
