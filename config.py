@@ -96,6 +96,8 @@ IMAGE_FRAGMENT_HEIGHT: int = int(os.getenv("IMAGE_FRAGMENT_HEIGHT", "960").strip
 IMAGE_CENTER: bool = _parse_bool(os.getenv("IMAGE_CENTER", "false"))
 IMAGE_DENSITY: int = int(os.getenv("IMAGE_DENSITY", "5").strip())
 IMAGE_PRINT_WIDTH: int = int(os.getenv("IMAGE_PRINT_WIDTH", "384").strip())  # CSN-A2 48mm @ 8 dots/mm
+IMAGE_HIGH_DENSITY_VERTICAL: bool = _parse_bool(os.getenv("IMAGE_HIGH_DENSITY_VERTICAL", "true"))
+IMAGE_HIGH_DENSITY_HORIZONTAL: bool = _parse_bool(os.getenv("IMAGE_HIGH_DENSITY_HORIZONTAL", "true"))
 
 # Image enhancement settings (new)
 IMAGE_ENHANCE_ENABLED: bool = _parse_bool(os.getenv("IMAGE_ENHANCE_ENABLED", "true"))

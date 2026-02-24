@@ -441,14 +441,13 @@ class AsyncPrinter:
             # Set print density before printing
             self.printer.set(density=config.IMAGE_DENSITY)
 
-            # Print image with configured parameters
             self.printer.image(
                 img,
                 impl=config.IMAGE_IMPL,
                 fragment_height=config.IMAGE_FRAGMENT_HEIGHT,
                 center=config.IMAGE_CENTER,
-                high_density_vertical=True,
-                high_density_horizontal=True,
+                high_density_vertical=config.IMAGE_HIGH_DENSITY_VERTICAL,
+                high_density_horizontal=config.IMAGE_HIGH_DENSITY_HORIZONTAL,
             )
 
             # Full re-initialize after image: ESC @ clears graphics mode so next text prints correctly
