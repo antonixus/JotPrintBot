@@ -71,6 +71,9 @@ TEXT_HEIGHT: int = int(os.getenv("TEXT_HEIGHT", "1").strip())
 TEXT_INVERT: int = int(os.getenv("TEXT_INVERT", "0").strip())
 TEXT_SMOOTH: bool = _parse_bool(os.getenv("TEXT_SMOOTH", "false"))
 TEXT_FLIP: bool = _parse_bool(os.getenv("TEXT_FLIP", "false"))
+TEXT_DOUBLE_HEIGHT: bool = _parse_bool(os.getenv("TEXT_DOUBLE_HEIGHT", "false"))
+TEXT_DOUBLE_WIDTH: bool = _parse_bool(os.getenv("TEXT_DOUBLE_WIDTH", "false"))
+TEXT_BOLD: bool = _parse_bool(os.getenv("TEXT_BOLD", "false"))
 
 # Bot behavior
 PRINT_RATE_LIMIT_SECONDS: int = int(os.getenv("PRINT_RATE_LIMIT_SECONDS", "10").strip())

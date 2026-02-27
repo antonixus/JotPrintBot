@@ -112,11 +112,14 @@ class AsyncPrinter:
                 align=config.TEXT_ALIGN,
                 font=font,
                 width=config.TEXT_WIDTH,
+                bold=config.TEXT_BOLD,
                 height=config.TEXT_HEIGHT,
                 density=config.DENSITY_LEVEL,
                 invert=config.TEXT_INVERT,
                 smooth=config.TEXT_SMOOTH,
                 flip=config.TEXT_FLIP,
+                double_height=config.TEXT_DOUBLE_HEIGHT, 
+                double_width=config.TEXT_DOUBLE_WIDTH,
             )
         except Exception:
             # Not all backends/printers support all settings
@@ -302,19 +305,22 @@ class AsyncPrinter:
 
         style = seg.style
         set_kwargs: dict[str, Any] = {}
-
-        if "bold" in style:
-            set_kwargs["bold"] = bool(style["bold"])
-        if "underline" in style:
-            set_kwargs["underline"] = int(style["underline"])
-        if "font" in style:
-            set_kwargs["font"] = str(style["font"])
-        if "double_height" in style:
-            set_kwargs["double_height"] = bool(style["double_height"])
-        if "double_width" in style:
-            set_kwargs["double_width"] = bool(style["double_width"])
-        if "invert" in style:
-            set_kwargs["invert"] = bool(style["invert"])
+        
+        # Map style keys to config defaults
+        style_mapping = {
+            "bold": config.TEXT_BOLD,
+            "underline": config.TEXT_UNDERLINE,
+            "font": config.FONT,
+            "double_height": config.TEXT_DOUBLE_HEIGHT,
+            "double_width": config.TEXT_DOUBLE_WIDTH,
+            "invert": config.TEXT_INVERT,
+        }
+        # Apply each style, using style value if present, otherwise config default
+        for key, default in style_mapping.items():
+            if key in style:
+                set_kwargs[key] = style[key]
+            else:
+                set_kwargs[key] = default
 
         if set_kwargs:
             try:
@@ -349,15 +355,15 @@ class AsyncPrinter:
                 underline=config.TEXT_UNDERLINE,
                 align=config.TEXT_ALIGN,
                 font=font,
-                bold=False,
+                bold=config.TEXT_BOLD,
                 width=config.TEXT_WIDTH,
                 height=config.TEXT_HEIGHT,
                 density=config.DENSITY_LEVEL,
                 invert=config.TEXT_INVERT,
                 smooth=config.TEXT_SMOOTH,
                 flip=config.TEXT_FLIP,
-                double_height=False,
-                double_width=False,
+                double_height=config.TEXT_DOUBLE_WIDTH,
+                double_width=config.TEXT_DOUBLE_HEIGHT,
             )
         except Exception:
             # Not all printers/profile combinations support all options.
